@@ -70,11 +70,11 @@ func TotalContractByCodeCompanyQuery(c chan int64, code string) {
 }
 
 // ValidateIfExistByCodeContract => buscar un Contrato en la base de datos por codeContract
-func ValidateIfExistByCodeContract(code string) bool {
+func ValidateIfExistByCodeContract(code string, codeCompany string) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	condition := bson.M{"codeContract": code}
+	condition := bson.M{"codeContract": code, "codeCompany": codeCompany}
 
 	var result models.Contract
 
@@ -162,6 +162,8 @@ func UpdateByID(id string, cUpdate models.Contract) (int64, error) {
 		"codeCategory":            cUpdate.CodeCategory,
 		"ammountMNInit":           cUpdate.AmmountMNInit,
 		"fileRoute":               cUpdate.FileRoute,
+		"supplements":             cUpdate.Supplements,
+		"nonCompliance":           cUpdate.NonCompliance,
 	}}
 
 	upd, err := db.ContractCollection.UpdateOne(ctx, condition, update)

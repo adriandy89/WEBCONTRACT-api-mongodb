@@ -11,4 +11,5 @@ import (
 func FilesRoutes(r *mux.Router) {
 	r.HandleFunc("/api/docs/{id}", middlewares.CheckDB(middlewares.ValidateJWT(filescontroller.DownloadFile))).Methods("GET")
 	r.HandleFunc("/api/docs", middlewares.CheckDB(filescontroller.UploadFile)).Methods("POST")
+	r.HandleFunc("/api/file/delete", middlewares.CheckDB(middlewares.ValidateJWT(filescontroller.DeleteFile))).Methods("POST")
 }

@@ -69,7 +69,7 @@ func FindAllCategories() ([]*models.Category, error) {
 	defer cancel()
 
 	var categories []*models.Category
-	cursor, err := db.CategoryCollection.Find(ctx, bson.M{})
+	cursor, err := db.CategoryCollection.Find(ctx, bson.M{}, options.Find().SetSort(bson.M{"name": 1}))
 	if err != nil {
 		return categories, err
 	}

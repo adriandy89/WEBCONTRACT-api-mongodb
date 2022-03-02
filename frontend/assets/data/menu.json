@@ -68,7 +68,7 @@
       {
         "text": "Usuarios",
         "icon": "users",
-        "routerLink": "/product/manage"
+        "routerLink": "/dashboard/users"
       }
     ]
   }

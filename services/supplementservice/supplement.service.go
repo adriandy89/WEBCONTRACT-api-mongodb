@@ -8,6 +8,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // InsertNewSuplement
@@ -63,7 +64,7 @@ func FindAllByCodeCompanyContractReeup(codeCompany string, codeContract string, 
 	var results []*models.Supplement
 
 	condition := bson.M{"codeCompany": codeCompany, "codeContract": codeContract, "codeReeup": codeReeup}
-	cursor, err := db.SuplementCollection.Find(ctx, condition)
+	cursor, err := db.SuplementCollection.Find(ctx, condition, options.Find().SetSort(bson.M{"codeSupplement": 1}))
 	if err != nil {
 		return results, false
 	}

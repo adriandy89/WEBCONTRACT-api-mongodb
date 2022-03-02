@@ -53,6 +53,21 @@ func FindByID(id string) (models.Entity, bool) {
 	return result, true
 }
 
+// FindByCodeCompany => Funcion para obtener entidad por codeCompany
+func FindByCodeCompany(id string) (models.Entity, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	condition := bson.M{"codeCompany": id}
+	var result models.Entity
+
+	err := db.EntityCollection.FindOne(ctx, condition).Decode(&result)
+	if err != nil {
+		return result, err
+	}
+	return result, err
+}
+
 // ValidateIfExistByNameAndCode => validar si existe la Entidad ---- NameQuery() y CodeQuery()--- concurrentes
 func ValidateIfExistByNameAndCode(name string, code string) bool {
 

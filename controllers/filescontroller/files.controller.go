@@ -1,8 +1,10 @@
 package filescontroller
 
 import (
+	"WEBCONTRACT-api-mongodb/models"
 	"WEBCONTRACT-api-mongodb/services/errorservice"
 	"WEBCONTRACT-api-mongodb/services/messageservice"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -58,14 +60,15 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 	// Create file
 	var dst *os.File
 	var err2 error
-	if !fileExist("./docs/" + handler.Filename) {
+	name := handler.Filename
+	if !fileExist("./docs/" + name) {
 		dst, err2 = os.Create("./docs/" + handler.Filename)
 		if err2 != nil {
 			errorservice.ErrorMessage(w, "Error en el servidor", 500)
 			return
 		}
 	} else {
-		name := "(1)" + handler.Filename
+		name = "(1)" + handler.Filename
 		for fileExist("./docs/" + name) {
 			name = getNewName(name)
 		}
@@ -83,7 +86,7 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 	}
 	defer dst.Close()
 
-	messageservice.SuccesMessage(w, "Archivo subido correctamente!", 200)
+	messageservice.SuccesMessage(w, name, 200)
 	//fmt.Fprintf(w, "Successfully Uploaded File\n")
 }
 
@@ -139,4 +142,30 @@ func RemoveChar(input string, cant int) string {
 		return ""
 	}
 	return input[cant:]
+}
+
+func DeleteFile(w http.ResponseWriter, r *http.Request) {
+
+	var rol string = r.Header.Get("rol")
+	if rol == "Admin" || rol == "SA" || rol == "Gestionador" {
+
+		var fileName models.Word
+		err := json.NewDecoder(r.Body).Decode(&fileName)
+		if err != nil {
+			errorservice.ErrorMessage(w, "Error en la validacion de datos", 400)
+			return
+		}
+		errDelete := os.Remove("./docs/" + fileName.Word)
+
+		if errDelete != nil {
+			errorservice.ErrorMessage(w, "Error elimando archivo"+errDelete.Error(), 500)
+			return
+		} else {
+			messageservice.SuccesMessage(w, "Archivo elimando correctamente", 200)
+			return
+		}
+	} else {
+		errorservice.ErrorMessage(w, "No tiene suficientes permisos para esta acción", 401)
+		return
+	}
 }

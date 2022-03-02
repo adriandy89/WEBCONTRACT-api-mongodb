@@ -101,7 +101,7 @@ type OfferRequest struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	CodeReeup   string             `bson:"codeReeup" json:"codeReeup"`
 	CodeOffer   string             `bson:"codeOffer" json:"codeOffer"`
-	CreatedAt   time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
+	CreatedAt   *time.Time         `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
 	AmmountMN   float32            `bson:"ammountMN" json:"ammountMN"`
 	AmmountCUC  float32            `bson:"ammountCUC" json:"ammountCUC"`
 	State       string             `bson:"state" json:"state"`
@@ -126,19 +126,19 @@ type Sector struct {
 
 // Supplement => Estructura de los Suplementos al Contrato
 type Supplement struct {
-	ID             primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CodeContract   string             `bson:"codeContract" json:"codeContract"`
-	CodeReeup      string             `bson:"codeReeup" json:"codeReeup"`
-	CodeSupplement string             `bson:"codeSupplement" json:"codeSupplement"`
-	CreatedAt      time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
-	ExpireAt       time.Time          `bson:"expireAt,omitempty" json:"expireAt,omitempty"`
-	State          string             `bson:"state" json:"state,omitempty"`
+	ID             primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	CodeContract   string             `bson:"codeContract,omitempty" json:"codeContract,omitempty"`
+	CodeReeup      string             `bson:"codeReeup,omitempty" json:"codeReeup,omitempty"`
+	CodeSupplement string             `bson:"codeSupplement,omitempty" json:"codeSupplement,omitempty"`
+	CreatedAt      *time.Time         `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
+	ExpireAt       *time.Time         `bson:"expireAt,omitempty" json:"expireAt,omitempty"`
+	State          string             `bson:"state,omitempty" json:"state,omitempty"`
 	Description    string             `bson:"description,omitempty" json:"description,omitempty"`
 	AmmountMN      float32            `bson:"ammountMN,omitempty" json:"ammountMN,omitempty"`
 	AmmountCUC     float32            `bson:"ammountCUC,omitempty" json:"ammountCUC,omitempty"`
 	OperationMN    int                `bson:"operationMN,omitempty" json:"operationMN,omitempty"`
-	OperationCUC   int                `bson:"operationCUC,omitempty" json:"operationCUC,omitempty"`
-	CodeCompany    string             `bson:"codeCompany" json:"codeCompany"`
+	OperationCUC   string             `bson:"operationCUC,omitempty" json:"operationCUC,omitempty"`
+	CodeCompany    string             `bson:"codeCompany,omitempty" json:"codeCompany,omitempty"`
 	FileRoute      []string           `bson:"fileRoute,omitempty" json:"fileRoute,omitempty"`
 }
 
@@ -149,14 +149,14 @@ type SupplementSpecific struct {
 	CodeContract   string             `bson:"codeContract" json:"codeContract"`
 	CodeReeup      string             `bson:"codeReeup" json:"codeReeup"`
 	CodeSupplement string             `bson:"codeSupplement" json:"codeSupplement"`
-	CreatedAt      time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
-	ExpireAt       time.Time          `bson:"expireAt,omitempty" json:"expireAt,omitempty"`
+	CreatedAt      *time.Time         `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
+	ExpireAt       *time.Time         `bson:"expireAt,omitempty" json:"expireAt,omitempty"`
 	State          string             `bson:"state" json:"state,omitempty"`
 	Description    string             `bson:"description,omitempty" json:"description,omitempty"`
 	AmmountMN      float32            `bson:"ammountMN,omitempty" json:"ammountMN,omitempty"`
 	AmmountCUC     float32            `bson:"ammountCUC,omitempty" json:"ammountCUC,omitempty"`
 	OperationMN    int                `bson:"operationMN,omitempty" json:"operationMN,omitempty"`
-	OperationCUC   int                `bson:"operationCUC,omitempty" json:"operationCUC,omitempty"`
+	OperationCUC   string             `bson:"operationCUC,omitempty" json:"operationCUC,omitempty"`
 	CodeCompany    string             `bson:"codeCompany" json:"codeCompany"`
 	FileRoute      []string           `bson:"fileRoute,omitempty" json:"fileRoute,omitempty"`
 }
@@ -170,12 +170,12 @@ type TypeFact struct {
 
 // Contract => Estructura de los Contratos
 type Contract struct {
-	ID                      primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CodeContract            string             `bson:"codeContract" json:"codeContract"`
+	ID                      primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	CodeContract            string             `bson:"codeContract,omitempty" json:"codeContract,omitempty"`
 	CodeReeup               string             `bson:"codeReeup,omitempty" json:"codeReeup,omitempty"`
 	CodeCompany             string             `bson:"codeCompany,omitempty" json:"codeCompany,omitempty"`
-	CreatedAt               time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
-	ExpireAt                time.Time          `bson:"expireAt,omitempty" json:"expireAt,omitempty"`
+	CreatedAt               *time.Time         `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
+	ExpireAt                *time.Time         `bson:"expireAt,omitempty" json:"expireAt,omitempty"`
 	CodeTypeCoin            string             `bson:"codeTypeCoin,omitempty" json:"codeTypeCoin,omitempty"`
 	CodeTypeContract        string             `bson:"codeTypeContract,omitempty" json:"codeTypeContract,omitempty"`
 	State                   string             `bson:"state,omitempty" json:"state,omitempty"`
@@ -188,19 +188,24 @@ type Contract struct {
 	PayPeriod               string             `bson:"payPeriod,omitempty" json:"payPeriod,omitempty"`
 	CreditDays              int                `bson:"creditDays,omitempty" json:"creditDays,omitempty"`
 	ClientSupplier          string             `bson:"clientSupplier,omitempty" json:"clientSupplier,omitempty"`
-	DateSuplementary        time.Time          `bson:"dateSuplementary,omitempty" json:"dateSuplementary,omitempty"`
+	DateSuplementary        *time.Time         `bson:"dateSuplementary,omitempty" json:"dateSuplementary,omitempty"`
 	CodeOfert               string             `bson:"codeOfert,omitempty" json:"codeOfert,omitempty"`
 	CodeObject              string             `bson:"codeObject,omitempty" json:"codeObject,omitempty"`
 	AmmountMNSuplementary   float32            `bson:"ammountMNSuplementary,omitempty" json:"ammountMNSuplementary,omitempty"`
 	AmmountCUCSuplementary  float32            `bson:"ammountCUCSuplementary,omitempty" json:"ammountCUCSuplementary,omitempty"`
 	CodeDescriptionState    string             `bson:"codeDescriptionState,omitempty" json:"codeDescriptionState,omitempty"`
 	CommentDescriptionState string             `bson:"commentDescriptionState,omitempty" json:"commentDescriptionState,omitempty"`
+	NonCompliance           []NonCompliance    `bson:"nonCompliance,omitempty" json:"nonCompliance,omitempty"`
 	PaymentTerm             int                `bson:"paymentTerm,omitempty" json:"paymentTerm,omitempty"`
 	CodeCategory            string             `bson:"codeCategory,omitempty" json:"codeCategory,omitempty"`
 	AmmountMNInit           float32            `bson:"ammountMNInit,omitempty" json:"ammountMNInit,omitempty"`
 	FileRoute               []string           `bson:"fileRoute,omitempty" json:"fileRoute,omitempty"`
 	ClientProviderName      string             `bson:"clientProviderName,omitempty" json:"clientProviderName,omitempty"`
 	Supplements             []*Supplement      `bson:"supplements,omitempty" json:"supplements,omitempty"`
+}
+type NonCompliance struct {
+	Name        string `bson:"name,omitempty" json:"name,omitempty"`
+	Description string `bson:"description,omitempty" json:"description,omitempty"`
 }
 
 // ContractSpecific => Estructura de los Contratos Especificos
@@ -210,8 +215,8 @@ type ContractSpecific struct {
 	CodeContract            string             `bson:"codeContract" json:"codeContract"`
 	CodeReeup               string             `bson:"codeReeup,omitempty" json:"codeReeup,omitempty"`
 	CodeCompany             string             `bson:"codeCompany,omitempty" json:"codeCompany,omitempty"`
-	CreatedAt               time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
-	ExpireAt                time.Time          `bson:"expireAt,omitempty" json:"expireAt,omitempty"`
+	CreatedAt               *time.Time         `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
+	ExpireAt                *time.Time         `bson:"expireAt,omitempty" json:"expireAt,omitempty"`
 	CodeTypeCoin            string             `bson:"codeTypeCoin,omitempty" json:"codeTypeCoin,omitempty"`
 	CodeTypeContract        string             `bson:"codeTypeContract,omitempty" json:"codeTypeContract,omitempty"`
 	State                   string             `bson:"state,omitempty" json:"state,omitempty"`
@@ -224,7 +229,7 @@ type ContractSpecific struct {
 	PayPeriod               string             `bson:"payPeriod,omitempty" json:"payPeriod,omitempty"`
 	CreditDays              int                `bson:"creditDays,omitempty" json:"creditDays,omitempty"`
 	ClientSupplier          string             `bson:"clientSupplier,omitempty" json:"clientSupplier,omitempty"`
-	DateSuplementary        time.Time          `bson:"dateSuplementary,omitempty" json:"dateSuplementary,omitempty"`
+	DateSuplementary        *time.Time         `bson:"dateSuplementary,omitempty" json:"dateSuplementary,omitempty"`
 	CodeOfert               string             `bson:"codeOfert,omitempty" json:"codeOfert,omitempty"`
 	CodeObject              string             `bson:"codeObject,omitempty" json:"codeObject,omitempty"`
 	AmmountMNSuplementary   float32            `bson:"ammountMNSuplementary,omitempty" json:"ammountMNSuplementary,omitempty"`
@@ -261,8 +266,8 @@ type ContractNonExecutionSpecific struct {
 
 // ClientProvider => Estructura de Cliente o proveedor
 type ClientProvider struct {
-	ID         primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CustId     string             `bson:"custId" json:"custId"`
+	ID         primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	CustId     string             `bson:"custId,omitempty" json:"custId,omitempty"`
 	CodOne     string             `bson:"codOne,omitempty" json:"codOne,omitempty"`
 	Name       string             `bson:"name,omitempty" json:"name,omitempty"`
 	Organism   string             `bson:"organism,omitempty" json:"organism,omitempty"`
@@ -276,7 +281,7 @@ type ClientProvider struct {
 	Address    string             `bson:"address,omitempty" json:"address,omitempty"`
 	City       string             `bson:"city,omitempty" json:"city,omitempty"`
 	ProvEstate string             `bson:"provEstate,omitempty" json:"provEstate,omitempty"`
-	CreateDate time.Time          `bson:"createDate,omitempty" json:"createDate,omitempty"`
-	ExpireDate time.Time          `bson:"expireDate,omitempty" json:"expireDate,omitempty"`
+	CreateDate *time.Time         `bson:"createDate,omitempty" json:"createDate,omitempty"`
+	ExpireDate *time.Time         `bson:"expireDate,omitempty" json:"expireDate,omitempty"`
 	Type       int                `bson:"type" json:"type"`
 }

@@ -28,6 +28,21 @@ func GetAllEntities(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(eList)
 }
 
+// GetEntityPrefixByCodeCompany => obtener el prefijo
+func GetEntityPrefixByCodeCompany(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	var codeCompany string = vars["codeCompany"]
+
+	entity1, err := entityservice.FindByCodeCompany(codeCompany)
+
+	if err != nil {
+		errorservice.ErrorMessage(w, "Invalidos: "+err.Error(), 400)
+		return
+	}
+	messageservice.SuccesMessage(w, entity1.Prefix, 200)
+}
+
 // EntityRegister
 func EntityRegister(w http.ResponseWriter, r *http.Request) {
 

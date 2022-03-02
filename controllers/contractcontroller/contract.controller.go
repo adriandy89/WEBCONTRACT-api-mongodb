@@ -7,6 +7,7 @@ import (
 	"WEBCONTRACT-api-mongodb/services/messageservice"
 	"WEBCONTRACT-api-mongodb/services/supplementservice"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -52,6 +53,9 @@ func GetContracts(w http.ResponseWriter, r *http.Request) {
 // ContractRegister => controlador de la ruta de registro de contratos
 func ContractRegister(w http.ResponseWriter, r *http.Request) {
 
+	vars := mux.Vars(r)
+	var codeCompany string = vars["codeCompany"]
+
 	var rol string = r.Header.Get("rol")
 	if rol == "Admin" || rol == "SA" || rol == "Gestionador" {
 		var contract models.Contract
@@ -61,7 +65,7 @@ func ContractRegister(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var cFounded bool = contractservice.ValidateIfExistByCodeContract(contract.CodeContract)
+		var cFounded bool = contractservice.ValidateIfExistByCodeContract(contract.CodeContract, codeCompany)
 
 		if cFounded {
 			errorservice.ErrorMessage(w, "Ese Codigo de Contrato ya existe", 400)
@@ -123,6 +127,7 @@ func UpdateContractByID(w http.ResponseWriter, r *http.Request) {
 		var contract models.Contract
 		err := json.NewDecoder(r.Body).Decode(&contract)
 		if err != nil {
+			log.Println(err)
 			errorservice.ErrorMessage(w, "Error en la validacion de datos", 400)
 			return
 		}
