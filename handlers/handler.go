@@ -34,6 +34,7 @@ func Handlers() {
 	routers.OfferRequestRoutes(router)
 	routers.OrganismRoutes(router)
 	routers.SupplementRoutes(router)
+	routers.SupplementSpecificRoutes(router)
 	routers.SupplementOperationRoutes(router)
 	routers.TypeContractRoutes(router)
 	routers.TypeFactRoutes(router)

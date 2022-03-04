@@ -103,6 +103,32 @@ func InsertNewContractSpecific(u models.ContractSpecific) error {
 	return err
 }
 
+// FindAllByCodeContract => return all contractSpecific registered by Company
+func FindAllByCodeCompanyContractReeup(codeCompany string, codeContract string, codeReeup string) ([]*models.ContractSpecific, bool) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	var results []*models.ContractSpecific
+
+	condition := bson.M{"codeCompany": codeCompany, "codeContract": codeContract, "codeReeup": codeReeup}
+	cursor, err := db.ContractSpecificCollection.Find(ctx, condition, options.Find().SetSort(bson.M{"codeSpecific": 1}))
+	if err != nil {
+		return results, false
+	}
+
+	for cursor.Next(context.TODO()) {
+		var contractSpecific models.ContractSpecific
+		err := cursor.Decode(&contractSpecific)
+		if err != nil {
+			return results, false
+		}
+		results = append(results, &contractSpecific)
+	}
+
+	return results, true
+}
+
 // DeleteByID => Funcion para eliminar contrato por id
 func DeleteByID(id string) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
@@ -173,6 +199,8 @@ func UpdateByID(id string, cUpdate models.ContractSpecific) (int64, error) {
 		"codeCategory":            cUpdate.CodeCategory,
 		"ammountMNInit":           cUpdate.AmmountMNInit,
 		"fileRoute":               cUpdate.FileRoute,
+		"supplementSpecific":      cUpdate.SupplementSpecific,
+		"nonCompliance":           cUpdate.NonCompliance,
 	}}
 
 	upd, err := db.ContractSpecificCollection.UpdateOne(ctx, condition, update)

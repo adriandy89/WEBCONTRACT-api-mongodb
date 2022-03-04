@@ -3,11 +3,11 @@ package contractcontroller
 import (
 	"WEBCONTRACT-api-mongodb/models"
 	"WEBCONTRACT-api-mongodb/services/contractservice"
+	contractspecificservice "WEBCONTRACT-api-mongodb/services/contractspecific.service.go"
 	"WEBCONTRACT-api-mongodb/services/errorservice"
 	"WEBCONTRACT-api-mongodb/services/messageservice"
 	"WEBCONTRACT-api-mongodb/services/supplementservice"
 	"encoding/json"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -41,6 +41,7 @@ func GetContracts(w http.ResponseWriter, r *http.Request) {
 	}
 	for i := 0; i < len(cList); i++ {
 		cList[i].Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		cList[i].Specifics, _ = contractspecificservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
 	}
 
 	var cListResp models.ContractReponse = models.ContractReponse{Total: total, ContractList: cList}
@@ -127,7 +128,6 @@ func UpdateContractByID(w http.ResponseWriter, r *http.Request) {
 		var contract models.Contract
 		err := json.NewDecoder(r.Body).Decode(&contract)
 		if err != nil {
-			log.Println(err)
 			errorservice.ErrorMessage(w, "Error en la validacion de datos", 400)
 			return
 		}
