@@ -33,7 +33,6 @@ func InsertNewUser(u models.User) error {
 
 	u.Password, _ = encriptPassword(u.Password)
 	u.CreatedAt = time.Now().UTC()
-	u.ExpireAt = time.Date(time.Now().Year()+1, time.Now().Month(), 10, 0, 0, 0, 0, time.UTC)
 
 	_, err := db.UserCollection.InsertOne(ctx, u)
 

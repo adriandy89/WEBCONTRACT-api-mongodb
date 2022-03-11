@@ -98,16 +98,17 @@ type NonEjecution struct {
 
 // OfferRequest => Estructura de las Solicitudes de Ofertas
 type OfferRequest struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CodeReeup   string             `bson:"codeReeup" json:"codeReeup"`
-	CodeOffer   string             `bson:"codeOffer" json:"codeOffer"`
-	CreatedAt   *time.Time         `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
-	AmmountMN   float32            `bson:"ammountMN" json:"ammountMN"`
-	AmmountCUC  float32            `bson:"ammountCUC" json:"ammountCUC"`
-	State       string             `bson:"state" json:"state"`
-	Description string             `bson:"description" json:"description"`
-	CodeCompany string             `bson:"codeCompany" json:"codeCompany"`
-	FileRoute   []string           `bson:"fileRoute" json:"fileRoute"`
+	ID                 primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	CodeReeup          string             `bson:"codeReeup,omitempty" json:"codeReeup,omitempty"`
+	CodeOffer          string             `bson:"codeOffer,omitempty" json:"codeOffer,omitempty"`
+	CreatedAt          *time.Time         `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
+	AmmountMN          float32            `bson:"ammountMN,omitempty" json:"ammountMN,omitempty"`
+	AmmountCUC         float32            `bson:"ammountCUC,omitempty" json:"ammountCUC,omitempty"`
+	State              string             `bson:"state,omitempty" json:"state,omitempty"`
+	Description        string             `bson:"description,omitempty" json:"description,omitempty"`
+	CodeCompany        string             `bson:"codeCompany,omitempty" json:"codeCompany,omitempty"`
+	FileRoute          []string           `bson:"fileRoute,omitempty" json:"fileRoute,omitempty"`
+	ClientProviderName string             `bson:"clientProviderName,omitempty" json:"clientProviderName,omitempty"`
 }
 
 // SupplementOperation => Estructura de las diferentes operaciones de los suplementos
@@ -203,6 +204,7 @@ type Contract struct {
 	ClientProviderName      string              `bson:"clientProviderName,omitempty" json:"clientProviderName,omitempty"`
 	Supplements             []*Supplement       `bson:"supplements,omitempty" json:"supplements,omitempty"`
 	Specifics               []*ContractSpecific `bson:"specifics,omitempty" json:"specifics,omitempty"`
+	Offer                   *OfferRequest       `bson:"offer,omitempty" json:"offer,omitempty"`
 }
 type NonCompliance struct {
 	Name        string `bson:"name,omitempty" json:"name,omitempty"`

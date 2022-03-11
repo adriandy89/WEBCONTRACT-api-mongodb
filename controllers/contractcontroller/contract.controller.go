@@ -6,6 +6,7 @@ import (
 	contractspecificservice "WEBCONTRACT-api-mongodb/services/contractspecific.service.go"
 	"WEBCONTRACT-api-mongodb/services/errorservice"
 	"WEBCONTRACT-api-mongodb/services/messageservice"
+	offerrequestservice "WEBCONTRACT-api-mongodb/services/offerRequestservice"
 	"WEBCONTRACT-api-mongodb/services/supplementservice"
 	"encoding/json"
 	"net/http"
@@ -42,6 +43,10 @@ func GetContracts(w http.ResponseWriter, r *http.Request) {
 	for i := 0; i < len(cList); i++ {
 		cList[i].Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
 		cList[i].Specifics, _ = contractspecificservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		if cList[i].CodeOfert != "" {
+			cList[i].Offer, _ = offerrequestservice.FindOneByCompanyReeupAndOffer(cList[i].CodeCompany, cList[i].CodeReeup, cList[i].CodeOfert)
+		}
+
 	}
 
 	var cListResp models.ContractReponse = models.ContractReponse{Total: total, ContractList: cList}
@@ -78,6 +83,15 @@ func ContractRegister(w http.ResponseWriter, r *http.Request) {
 			errorservice.ErrorMessage(w, "Error en registro en la base de datos", 500)
 			return
 		} else {
+
+			if contract.CodeOfert != "" && contract.CodeReeup != "" {
+				offer, exist := offerrequestservice.FindOneByCompanyReeupAndOffer(contract.CodeCompany, contract.CodeReeup, contract.CodeOfert)
+				if exist {
+					offer.State = "Inactivo"
+					offerrequestservice.UpdateByID(offer.ID.Hex(), *offer)
+				}
+			}
+
 			messageservice.SuccesMessage(w, "Contrato creado correctamente", 200)
 			return
 		}
@@ -158,6 +172,13 @@ func UpdateContractByID(w http.ResponseWriter, r *http.Request) {
 		if count == 0 {
 			messageservice.SuccesMessage(w, "No se modificaron ninguno de los campos", 202)
 			return
+		}
+		if contract.CodeOfert != "" && contract.CodeReeup != "" {
+			offer, exist := offerrequestservice.FindOneByCompanyReeupAndOffer(contract.CodeCompany, contract.CodeReeup, contract.CodeOfert)
+			if exist {
+				offer.State = "Inactivo"
+				offerrequestservice.UpdateByID(offer.ID.Hex(), *offer)
+			}
 		}
 		messageservice.SuccesMessage(w, "Contrato actualizado correctamente", 200)
 	} else {

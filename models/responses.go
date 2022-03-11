@@ -24,6 +24,12 @@ type ContractReponse struct {
 	ContractList []*Contract `json:"contractList"`
 }
 
+// OfferRequestReponse => Cuerpo de respuesta la momento de devolver ofertas
+type OfferRequestReponse struct {
+	Total            int64           `json:"total"`
+	OfferRequestList []*OfferRequest `json:"offerRequestList"`
+}
+
 // ContractNonExecutionReponse => Cuerpo de respuesta la momento de devolver contractnonexecution
 type ContractNonExecutionReponse struct {
 	Total                    int64                   `json:"total"`

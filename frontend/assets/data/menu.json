@@ -5,6 +5,11 @@
     "routerLink": "/dashboard"
   },
   {
+    "text": "Ofertas",
+    "icon": "contracts",
+    "routerLink": "/dashboard/offers"
+  },
+  {
     "text": "Contratos",
     "icon": "contracts",
     "children": [

@@ -36,6 +36,9 @@ func Login(username string, pass string) (models.User, bool) {
 		if !exist {
 			return user, false
 		}
+		if userLogged.State == 0 {
+			return user, false
+		}
 
 		passwordBytes := []byte(pass)
 		passwordDB := []byte(userLogged.Password)

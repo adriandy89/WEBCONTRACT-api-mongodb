@@ -166,7 +166,6 @@ func UpdateUserByID(w http.ResponseWriter, r *http.Request) {
 			errorservice.ErrorMessage(w, "Ese usuario ya está registrado en la base de datos", 400)
 			return
 		}
-
 		count, err := userservice.UpdateByID(idUser, user)
 		if err != nil {
 			errorservice.ErrorMessage(w, "Error al actualizar la base de datos", 500)
