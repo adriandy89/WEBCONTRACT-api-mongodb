@@ -6,7 +6,7 @@
   },
   {
     "text": "Ofertas",
-    "icon": "contracts",
+    "icon": "offer",
     "routerLink": "/dashboard/offers"
   },
   {
@@ -32,11 +32,6 @@
         "text": "Alertas",
         "icon": "alert",
         "routerLink": "/dashboard/b"
-      },
-      {
-        "text": "Ofertas",
-        "icon": "offer",
-        "routerLink": "/dashboard/c"
       }
     ]
   },
@@ -63,7 +58,7 @@
       {
         "text": "Nomencladores",
         "icon": "archive",
-        "routerLink": "/product/category"
+        "routerLink": "/dashboard/nomenclator"
       },
       {
         "text": "Entidades",
