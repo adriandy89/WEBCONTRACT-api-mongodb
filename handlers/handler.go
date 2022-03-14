@@ -37,6 +37,7 @@ func Handlers() {
 	routers.SupplementOperationRoutes(router)
 	routers.TypeContractRoutes(router)
 	routers.TypeFactRoutes(router)
+	routers.SectorRoutes(router)
 	routers.FilesRoutes(router)
 
 	//router.PathPrefix("/").Handler(http.FileServer(http.Dir("./frontend"))).Methods("GET")

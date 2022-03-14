@@ -38,6 +38,7 @@ var SuplementSpecificCollection = DB.Collection("supplementsSpecific")
 var SupplementsOperationsCollection = DB.Collection("supplementsOperations")
 var TypeContractsCollection = DB.Collection("typeContracts")
 var TypeFactsCollection = DB.Collection("typeFacts")
+var SectorCollection = DB.Collection("sectors")
 
 func conectarDB() *mongo.Client {
 

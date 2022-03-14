@@ -51,3 +51,7 @@ type TypeContractResponse struct {
 type ObjectContractResponse struct {
 	ObjectContractList []*ObjectContract `json:"objectContractList"`
 }
+
+type SectorResponse struct {
+	SectortList []*Sector `json:"sectortList"`
+}
