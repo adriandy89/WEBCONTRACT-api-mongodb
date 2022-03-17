@@ -64,14 +64,48 @@ func GetClientProvidersByWord(w http.ResponseWriter, r *http.Request) {
 		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
 		return
 	}
-	cpList, founded := clientproviderservice.FindByNameOrCode(number, order, typ, numberPage, word.Word)
+	cpList, total, founded := clientproviderservice.FindByNameOrCode(number, order, typ, numberPage, word.Word)
 
 	if !founded {
 		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
 		return
 	}
 
-	var cpListResp models.ClientProviderReponse = models.ClientProviderReponse{ClientProviderList: cpList}
+	var cpListResp models.ClientProviderReponse = models.ClientProviderReponse{Total: total, ClientProviderList: cpList}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(cpListResp)
+}
+
+func GetClientProvidersByWordFullData(w http.ResponseWriter, r *http.Request) {
+
+	var word models.Word
+
+	err := json.NewDecoder(r.Body).Decode(&word)
+	if err != nil {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+
+	vars := mux.Vars(r)
+	var count string = vars["count"]
+	var order string = vars["order"]
+	var typ string = vars["typ"]
+	var page string = vars["page"]
+	number, err := strconv.Atoi(count)
+	numberPage, err1 := strconv.Atoi(page)
+	if number <= 0 || numberPage <= 0 || err != nil || err1 != nil || order == "" || typ == "" || word.Word == "" {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+	cpList, total, founded := clientproviderservice.FindByNameOrCodeFullData(number, order, typ, numberPage, word.Word)
+
+	if !founded {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+
+	var cpListResp models.ClientProviderReponse = models.ClientProviderReponse{Total: total, ClientProviderList: cpList}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(cpListResp)
@@ -169,7 +203,7 @@ func UpdateClientProviderByID(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if <-c && clientProvider.CustId != cpUpdate.CustId {
-			errorservice.ErrorMessage(w, "Esa categoria ya existe", 400)
+			errorservice.ErrorMessage(w, "Ese Cliente y/o Proveedor ya existe", 400)
 			return
 		}
 
@@ -182,7 +216,7 @@ func UpdateClientProviderByID(w http.ResponseWriter, r *http.Request) {
 			messageservice.SuccesMessage(w, "No se modificaron ninguno de los campos", 202)
 			return
 		}
-		messageservice.SuccesMessage(w, "Categoria actualizada correctamente", 200)
+		messageservice.SuccesMessage(w, "Cliente y/o Proveedor actualizado correctamente", 200)
 	} else {
 		errorservice.ErrorMessage(w, "No tiene suficientes permisos para esta acción", 401)
 		return

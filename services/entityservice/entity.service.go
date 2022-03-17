@@ -8,6 +8,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // FindAllEntities => Devuelve todas las entidades
@@ -16,7 +17,7 @@ func FindAllEntities() ([]*models.Entity, error) {
 	defer cancel()
 
 	var entities []*models.Entity
-	cursor, err := db.EntityCollection.Find(ctx, bson.M{})
+	cursor, err := db.EntityCollection.Find(ctx, bson.M{}, options.Find().SetSort(bson.M{"codeCompany": 1}))
 	if err != nil {
 		return entities, err
 	}

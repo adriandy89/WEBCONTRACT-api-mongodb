@@ -1,0 +1,44 @@
+[
+  {
+    "text": "Inicio",
+    "icon": "home",
+    "routerLink": "/dashboard"
+  },
+  {
+    "text": "Ofertas",
+    "icon": "offer",
+    "routerLink": "/dashboard/offers"
+  },
+  {
+    "text": "Contratos",
+    "icon": "contracts",
+    "children": [
+      {
+        "text": "Listar",
+        "icon": "list",
+        "routerLink": "/dashboard/contracts"
+      },
+      {
+        "text": "Alertas",
+        "icon": "alert",
+        "routerLink": "/dashboard/b"
+      }
+    ]
+  },
+  {
+    "text": "Informes",
+    "icon": "information",
+    "children": [
+      {
+        "text": "Graficos",
+        "icon": "add",
+        "routerLink": "/product/category"
+      },
+      {
+        "text": "Otros",
+        "icon": "add",
+        "routerLink": "/product/sub-category"
+      }
+    ]
+  }
+]

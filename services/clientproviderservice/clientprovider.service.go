@@ -20,7 +20,7 @@ func FindByCountAndSort(count int, order string, typ string, page int) ([]*model
 	c := make(chan int64)
 
 	var sort int = 1
-	if typ == "d" {
+	if typ == "desc" {
 		sort = -1
 	}
 	pageNumber := 0
@@ -183,20 +183,20 @@ func CustIdQuery(code string, d chan bool) {
 }
 
 // FindByNameOrCode => devuelve los Clientes y proveedores filtrados  ---------- TotalClientProviderQuery() --- concurrentes
-func FindByNameOrCode(count int, order string, typ string, page int, word string) ([]*models.ClientProvider, bool) {
+func FindByNameOrCode(count int, order string, typ string, page int, word string) ([]*models.ClientProvider, int64, bool) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-
+	c := make(chan int64)
 	var sort int = 1
-	if typ == "d" {
+	if typ == "desc" {
 		sort = -1
 	}
 	pageNumber := 0
 	if page > 1 {
 		pageNumber = (page - 1) * count
 	}
-
+	go TotalClientProviderQueryByWord(c, word)
 	var clientProviders []*models.ClientProvider
 	cursor, err := db.ClientProviderCollection.Find(ctx,
 		bson.M{
@@ -209,11 +209,11 @@ func FindByNameOrCode(count int, order string, typ string, page int, word string
 		options.Find().SetProjection(bson.D{{"name", 1}, {"custId", 1}, {"type", 1}}),
 		options.Find().SetSkip(int64(pageNumber)).SetSort(bson.M{order: sort}))
 	if err != nil {
-		return clientProviders, false
+		return clientProviders, 0, false
 	}
 	err = cursor.Err()
 	if err != nil {
-		return clientProviders, false
+		return clientProviders, 0, false
 	}
 
 	defer cursor.Close(context.Background())
@@ -221,9 +221,70 @@ func FindByNameOrCode(count int, order string, typ string, page int, word string
 		var clientProvider models.ClientProvider
 		err := cursor.Decode(&clientProvider)
 		if err != nil {
-			return clientProviders, false
+			return clientProviders, 0, false
 		}
 		clientProviders = append(clientProviders, &clientProvider)
 	}
-	return clientProviders, true
+	return clientProviders, <-c, true
+}
+
+func FindByNameOrCodeFullData(count int, order string, typ string, page int, word string) ([]*models.ClientProvider, int64, bool) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	c := make(chan int64)
+	var sort int = 1
+	if typ == "desc" {
+		sort = -1
+	}
+	pageNumber := 0
+	if page > 1 {
+		pageNumber = (page - 1) * count
+	}
+	go TotalClientProviderQueryByWord(c, word)
+	var clientProviders []*models.ClientProvider
+	cursor, err := db.ClientProviderCollection.Find(ctx,
+		bson.M{
+			"$or": []bson.M{
+				bson.M{"name": bson.M{"$regex": word, "$options": "im"}},
+				bson.M{"custId": bson.M{"$regex": word, "$options": "im"}},
+			},
+		},
+		options.Find().SetLimit(int64(count)),
+		options.Find().SetSkip(int64(pageNumber)).SetSort(bson.M{order: sort}))
+	if err != nil {
+		return clientProviders, 0, false
+	}
+	err = cursor.Err()
+	if err != nil {
+		return clientProviders, 0, false
+	}
+
+	defer cursor.Close(context.Background())
+	for cursor.Next(context.Background()) {
+		var clientProvider models.ClientProvider
+		err := cursor.Decode(&clientProvider)
+		if err != nil {
+			return clientProviders, 0, false
+		}
+		clientProviders = append(clientProviders, &clientProvider)
+	}
+	return clientProviders, <-c, true
+}
+
+func TotalClientProviderQueryByWord(c chan int64, word string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	cursor, err := db.ClientProviderCollection.CountDocuments(ctx, bson.M{
+		"$or": []bson.M{
+			bson.M{"name": bson.M{"$regex": word, "$options": "im"}},
+			bson.M{"custId": bson.M{"$regex": word, "$options": "im"}},
+		},
+	})
+	if err != nil {
+		c <- 0
+	} else {
+		c <- cursor
+	}
 }

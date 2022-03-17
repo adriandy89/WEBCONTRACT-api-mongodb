@@ -56,6 +56,41 @@ func GetContracts(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func GetContractsByWord(w http.ResponseWriter, r *http.Request) {
+
+	var word models.Word
+
+	err := json.NewDecoder(r.Body).Decode(&word)
+	if err != nil {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+
+	vars := mux.Vars(r)
+	var codeCompany string = vars["codeCompany"]
+	var count string = vars["count"]
+	var order string = vars["order"]
+	var typ string = vars["typ"]
+	var page string = vars["page"]
+	number, err := strconv.Atoi(count)
+	numberPage, err1 := strconv.Atoi(page)
+	if number <= 0 || numberPage <= 0 || err != nil || err1 != nil || order == "" || typ == "" || word.Word == "" {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+	cList, total, founded := contractservice.FindByNameOrCode(codeCompany, number, order, typ, numberPage, word.Word)
+
+	if !founded {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+
+	var cListResp models.ContractReponse = models.ContractReponse{Total: total, ContractList: cList}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(cListResp)
+}
+
 // ContractRegister => controlador de la ruta de registro de contratos
 func ContractRegister(w http.ResponseWriter, r *http.Request) {
 

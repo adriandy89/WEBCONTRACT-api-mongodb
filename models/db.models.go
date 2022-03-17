@@ -23,77 +23,77 @@ type User struct {
 
 // Country => Estructura de las Provincias
 type Country struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CodeCountry string             `bson:"codeCountry" json:"codeCountry"`
-	Name        string             `bson:"name" json:"name"`
-	Initial     string             `bson:"initial" json:"initial,omitempty"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	CodeCountry string             `bson:"codeCountry,omitempty" json:"codeCountry,omitempty"`
+	Name        string             `bson:"name,omitempty" json:"name,omitempty"`
+	Initial     string             `bson:"initial,omitempty" json:"initial,omitempty"`
 }
 
 // Organism => Estructura de los Organismos
 type Organism struct {
-	ID           primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CodeOrganism string             `bson:"codeOrganism" json:"codeOrganism"`
-	Name         string             `bson:"name" json:"name"`
+	ID           primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	CodeOrganism string             `bson:"codeOrganism,omitempty" json:"codeOrganism,omitempty"`
+	Name         string             `bson:"name,omitempty" json:"name,omitempty"`
 	Initial      string             `bson:"initial,omitempty" json:"initial,omitempty"`
 }
 
 // TypeContract => Estructura de los tipos de Contratos
 type TypeContract struct {
-	ID               primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CodeTypeContract string             `bson:"codeTypeContract" json:"codeTypeContract"`
-	Name             string             `bson:"name" json:"name"`
+	ID               primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	CodeTypeContract string             `bson:"codeTypeContract,omitempty" json:"codeTypeContract,omitempty"`
+	Name             string             `bson:"name,omitempty" json:"name,omitempty"`
 }
 
 // ObjectContract => Estructura de los objetivos de los Contratos
 type ObjectContract struct {
-	ID                 primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CodeObjectContract string             `bson:"codeObjectContract" json:"codeObjectContract"`
-	Name               string             `bson:"name" json:"name"`
+	ID                 primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	CodeObjectContract string             `bson:"codeObjectContract,omitempty" json:"codeObjectContract,omitempty"`
+	Name               string             `bson:"name,omitempty" json:"name,omitempty"`
 }
 
 // Currency => Estructura de las Monedas
 type Currency struct {
-	ID       primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	Currency string             `bson:"currency" json:"currency"`
-	Name     string             `bson:"name" json:"name"`
+	ID       primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	Currency string             `bson:"currency,omitempty" json:"currency,omitempty"`
+	Name     string             `bson:"name,omitempty" json:"name,omitempty"`
 }
 
 // Category => Estructura de las Categorias
 type Category struct {
-	ID           primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CodeCategory string             `bson:"codeCategory" json:"codeCategory"`
-	Name         string             `bson:"name" json:"name"`
+	ID           primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	CodeCategory string             `bson:"codeCategory,omitempty" json:"codeCategory,omitempty"`
+	Name         string             `bson:"name,omitempty" json:"name,omitempty"`
 }
 
 // Entity  => Estructura de las entidades
 type Entity struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CodeCompany string             `bson:"codeCompany" json:"codeCompany"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	CodeCompany string             `bson:"codeCompany,omitempty" json:"codeCompany,omitempty"`
 	Address     string             `bson:"address,omitempty" json:"address,omitempty"`
 	Prefix      string             `bson:"prefix,omitempty" json:"prefix,omitempty"`
-	CompanyName string             `bson:"companyName" json:"companyName"`
+	CompanyName string             `bson:"companyName,omitempty" json:"companyName,omitempty"`
 	CodeFather  string             `bson:"codeFather,omitempty" json:"codeFather,omitempty"`
 }
 
 // UserRol => Estructura de Roles de Usuarios
 type UserRolType struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	Type        string             `bson:"type" json:"type"`
-	Description string             `bson:"description" json:"description,omitempty"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	Type        string             `bson:"type,omitempty" json:"type,omitempty"`
+	Description string             `bson:"description,omitempty" json:"description,omitempty"`
 }
 
 // DescriptionState => Estructura de las opciones de finalizar contrato
 type DescriptionState struct {
-	ID                   primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CodeDescriptionState int                `bson:"codeDescriptionState" json:"codeDescriptionState"`
-	Description          string             `bson:"description" json:"description"`
+	ID                   primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	CodeDescriptionState int                `bson:"codeDescriptionState,omitempty" json:"codeDescriptionState,omitempty"`
+	Description          string             `bson:"description,omitempty" json:"description,omitempty"`
 }
 
 // NonEjecution => Estructura de las opciones de Incumplimiento - Tipo de reclamaciones
 type NonEjecution struct {
-	ID               primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CodeNonExecution int                `bson:"codeNonExecution" json:"codeNonExecution"`
-	Description      string             `bson:"description" json:"description"`
+	ID               primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	CodeNonExecution int                `bson:"codeNonExecution,omitempty" json:"codeNonExecution,omitempty"`
+	Description      string             `bson:"description,omitempty" json:"description,omitempty"`
 }
 
 // OfferRequest => Estructura de las Solicitudes de Ofertas
@@ -113,16 +113,16 @@ type OfferRequest struct {
 
 // SupplementOperation => Estructura de las diferentes operaciones de los suplementos
 type SupplementOperation struct {
-	ID            primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CodeOperation int                `bson:"codeOperation" json:"codeOperation"`
-	Description   string             `bson:"description" json:"description"`
+	ID            primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	CodeOperation int                `bson:"codeOperation,omitempty" json:"codeOperation,omitempty"`
+	Description   string             `bson:"description,omitempty" json:"description,omitempty"`
 }
 
 // Sector => Estructura de los sectores
 type Sector struct {
-	ID         primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CodeSector int                `bson:"codeSector" json:"codeSector"`
-	Name       string             `bson:"name" json:"name"`
+	ID         primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	CodeSector int                `bson:"codeSector,omitempty" json:"codeSector,omitempty"`
+	Name       string             `bson:"name,omitempty" json:"name,omitempty"`
 }
 
 // Supplement => Estructura de los Suplementos al Contrato
@@ -164,9 +164,9 @@ type SupplementSpecific struct {
 
 // TypeFact => Estructura de Tipo de facturacion
 type TypeFact struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CodeFact    int                `bson:"codeFact" json:"codeFact"`
-	Description string             `bson:"description" json:"description"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	CodeFact    int                `bson:"codeFact,omitempty" json:"codeFact,omitempty"`
+	Description string             `bson:"description,omitempty" json:"description,omitempty"`
 }
 
 // Contract => Estructura de los Contratos
@@ -250,24 +250,24 @@ type ContractSpecific struct {
 
 // ContractNonExecution => Estructura de Contratos no ejecutados
 type ContractNonExecution struct {
-	ID                     primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	CodeContract           string             `bson:"codeContract" json:"codeContract"`
-	CodeReeup              string             `bson:"codeReeup" json:"codeReeup"`
-	IdNonExecution         string             `bson:"idNonExecution" json:"idNonExecution"`
-	ContractNonExecution   string             `bson:"contractNonExecution" json:"contractNonExecution"`
-	IdContractNonExecution int                `bson:"idContractNonExecution" json:"idContractNonExecution"`
-	CodeCompany            string             `bson:"codeCompany" json:"codeCompany"`
+	ID                     primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	CodeContract           string             `bson:"codeContract,omitempty" json:"codeContract,omitempty"`
+	CodeReeup              string             `bson:"codeReeup,omitempty" json:"codeReeup,omitempty"`
+	IdNonExecution         string             `bson:"idNonExecution,omitempty" json:"idNonExecution,omitempty"`
+	ContractNonExecution   string             `bson:"contractNonExecution,omitempty" json:"contractNonExecution,omitempty"`
+	IdContractNonExecution int                `bson:"idContractNonExecution,omitempty" json:"idContractNonExecution,omitempty"`
+	CodeCompany            string             `bson:"codeCompany,omitempty" json:"codeCompany,omitempty"`
 }
 
 // ContractNonExecution => Estructura de Contratos Especificos no ejecutados
 type ContractNonExecutionSpecific struct {
-	CodeSpecific           string `bson:"codeSpecific" json:"codeSpecific"`
-	CodeContract           string `bson:"codeContract" json:"codeContract"`
-	CodeReeup              string `bson:"codeReeup" json:"codeReeup"`
-	IdNonExecution         string `bson:"idNonExecution" json:"idNonExecution"`
-	ContractNonExecution   string `bson:"contractNonExecution" json:"contractNonExecution"`
-	IdContractNonExecution int    `bson:"idContractNonExecution" json:"idContractNonExecution"`
-	CodeCompany            string `bson:"codeCompany" json:"codeCompany"`
+	CodeSpecific           string `bson:"codeSpecific,omitempty" json:"codeSpecific,omitempty"`
+	CodeContract           string `bson:"codeContract,omitempty" json:"codeContract,omitempty"`
+	CodeReeup              string `bson:"codeReeup,omitempty" json:"codeReeup,omitempty"`
+	IdNonExecution         string `bson:"idNonExecution,omitempty" json:"idNonExecution,omitempty"`
+	ContractNonExecution   string `bson:"contractNonExecution,omitempty" json:"contractNonExecution,omitempty"`
+	IdContractNonExecution int    `bson:"idContractNonExecution,omitempty" json:"idContractNonExecution,omitempty"`
+	CodeCompany            string `bson:"codeCompany,omitempty" json:"codeCompany,omitempty"`
 }
 
 // ClientProvider => Estructura de Cliente o proveedor

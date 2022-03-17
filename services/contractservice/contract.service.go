@@ -3,7 +3,6 @@ package contractservice
 import (
 	"WEBCONTRACT-api-mongodb/db"
 	"WEBCONTRACT-api-mongodb/models"
-	"WEBCONTRACT-api-mongodb/services/clientproviderservice"
 	"context"
 	"time"
 
@@ -50,11 +49,75 @@ func FindByCountAndSort(codeCompany string, count int, order string, typ string,
 		if err != nil {
 			return contracts, 0, false
 		}
-		contract.ClientProviderName, _ = clientproviderservice.FindNameByCustID(contract.CodeReeup)
+		//contract.ClientProviderName, _ = clientproviderservice.FindNameByCustID(contract.CodeReeup)
 		contracts = append(contracts, &contract)
 	}
 	return contracts, <-c, true
 }
+
+func FindByNameOrCode(codeCompany string, count int, order string, typ string, page int, word string) ([]*models.Contract, int64, bool) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	c := make(chan int64)
+	var sort int = 1
+	if typ == "desc" {
+		sort = -1
+	}
+	pageNumber := 0
+	if page > 1 {
+		pageNumber = (page - 1) * count
+	}
+	go TotalContractsQueryByWord(c, word, codeCompany)
+	var contracts []*models.Contract
+	cursor, err := db.ContractCollection.Find(ctx,
+		bson.M{
+			"codeCompany": codeCompany,
+			"$or": []bson.M{
+				bson.M{"clientProviderName": bson.M{"$regex": word, "$options": "im"}},
+				bson.M{"codeContract": bson.M{"$regex": word, "$options": "im"}},
+			},
+		},
+		options.Find().SetLimit(int64(count)),
+		options.Find().SetSkip(int64(pageNumber)).SetSort(bson.M{order: sort}))
+	if err != nil {
+		return contracts, 0, false
+	}
+	err = cursor.Err()
+	if err != nil {
+		return contracts, 0, false
+	}
+
+	defer cursor.Close(context.Background())
+	for cursor.Next(context.Background()) {
+		var contract models.Contract
+		err := cursor.Decode(&contract)
+		if err != nil {
+			return contracts, 0, false
+		}
+		contracts = append(contracts, &contract)
+	}
+	return contracts, <-c, true
+}
+
+func TotalContractsQueryByWord(c chan int64, word string, codeCompany string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	cursor, err := db.ContractCollection.CountDocuments(ctx, bson.M{
+		"codeCompany": codeCompany,
+		"$or": []bson.M{
+			bson.M{"clientProviderName": bson.M{"$regex": word, "$options": "im"}},
+			bson.M{"codeContract": bson.M{"$regex": word, "$options": "im"}},
+		},
+	})
+	if err != nil {
+		c <- 0
+	} else {
+		c <- cursor
+	}
+}
+
 func TotalContractByCodeCompanyQuery(c chan int64, code string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
