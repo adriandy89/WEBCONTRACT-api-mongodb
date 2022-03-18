@@ -107,6 +107,28 @@ func GetAllUsersByComapany(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetAllUsers => function to get all enable users
+func GetAllUsers(w http.ResponseWriter, r *http.Request) {
+
+	var rol string = r.Header.Get("rol")
+	if rol == "SA" {
+
+		userList, founded := userservice.FindAll()
+		if !founded {
+			errorservice.ErrorMessage(w, "Error en la validacion de datos", 400)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(userList)
+
+	} else {
+		errorservice.ErrorMessage(w, "No tiene suficientes permisos para esta acción", 401)
+		return
+	}
+}
+
 // DeleteUserByID => eliminar un solo usuario mediante un id en los parametros
 func DeleteUserByID(w http.ResponseWriter, r *http.Request) {
 

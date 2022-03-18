@@ -100,6 +100,32 @@ func FindAllByCompany(company string) ([]*models.User, bool) {
 	return results, true
 }
 
+// FindAll => return all users registered by Company
+func FindAll() ([]*models.User, bool) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	var results []*models.User
+
+	cursor, err := db.UserCollection.Find(ctx, bson.M{})
+	if err != nil {
+		return results, false
+	}
+
+	for cursor.Next(context.TODO()) {
+		var user models.User
+		err := cursor.Decode(&user)
+		if err != nil {
+			return results, false
+		}
+		user.Password = ""
+		results = append(results, &user)
+	}
+
+	return results, true
+}
+
 // DeleteByID => Funcion para eliminar usuario por id
 func DeleteByID(id string) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
