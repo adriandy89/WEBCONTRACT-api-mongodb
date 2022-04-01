@@ -8,6 +8,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // FindAllDescriptionsStates => Devuelve todas las Descipciones de estado
@@ -16,7 +17,7 @@ func FindAllDescriptionsStates() ([]*models.DescriptionState, error) {
 	defer cancel()
 
 	var descriptionsStates []*models.DescriptionState
-	cursor, err := db.DescriptionsStatesCollection.Find(ctx, bson.M{})
+	cursor, err := db.DescriptionsStatesCollection.Find(ctx, bson.M{}, options.Find().SetSort(bson.M{"description": 1}))
 	if err != nil {
 		return descriptionsStates, err
 	}

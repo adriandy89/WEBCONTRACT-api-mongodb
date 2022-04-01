@@ -1,0 +1,11 @@
+Requisitos a controlar
+
+En el caso de los usuarios y contraseñas, el sistema al acceder debe validar que este en AD de CIMEX y si es así dejarlo acceder a la aplicación, de lo contrario (sino lo encuentra en el AD) revisaría que ese usuario exista en la BD de la aplicación y si existe lo dejaría acceder como usuario local.
+
+Se debe controlar que los usuarios con rol gestionadores solo tengan acceso a las entidades a las cuales se les de permisos y esto solo lo puede hacer el admin. Es decir un usuario de Audita Cienfuegos por defecto al añadirlo a la aplicación como usuario de esa entidad, al acceder solo podría acceder a esa entidad.
+
+Los usuarios con rol de revisores por defecto se asocian a la entidad por dónde se crean igual que los anteriores, pero el admin les puede dar permisos para que acceda a otras entidades dentro de organización (Padre-Hijos). Ejemplo: Revisor en Casa Matriz, el admin le puede dar permisos para que acceda con su mismo usuario y contraseña a todas las entidades hijos de Casa Matriz, en en esta caso Audita Matanzas, Cienfuegos, Camaguey, Holguin, etc.
+
+En nomencladores habría que crea algo dónde se defina el tiempo de vigencia de los contratos en años y dónde el usuario pueda poner 1, 2, 5 o cualquier número. Esto hay que hacerlo para que cuando se cree un contrato, si el usurio en fecha de vencimiento pones una fecha superior a la defina en el nomenclador, entonces debería alertarle lo siguiente (La fecha añadida excede el tiempo definido por su entidad para el vencimiento de los contratos) Desea continuar Si o No
+
+Al crear el contrato, si el código selecionado es de cliente, el campo Contrato de, debería poner automático "cliente" y si es de proveedor "proveedor", no debería ser un campo para seleccionar porque desde que se define el código ya se sabe que es de Cliente o de Proveedor.

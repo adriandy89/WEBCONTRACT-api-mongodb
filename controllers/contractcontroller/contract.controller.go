@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -294,6 +295,143 @@ func GetCodeContract(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(arrNew)
 		return
 	}
+}
+
+func GetContractsEnding(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	var codeCompany string = vars["codeCompany"]
+	var total string = vars["type"]
+
+	cList, founded := contractservice.FindByCodeCompanyAndDate(codeCompany)
+
+	if !founded {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+	today := time.Now().Add(-24 * time.Hour)
+	ending := 0
+	ended := 0
+	for i := 0; i < len(cList); i++ {
+
+		cList[i].Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		truncated := false
+		for j := 0; j < len(cList[i].Supplements); j++ {
+			if cList[i].Supplements[j].ExpireAt != nil {
+				if cList[i].Supplements[j].ExpireAt.After(time.Now().Add(360*time.Hour)) && cList[i].Supplements[j].State == "Activo" {
+					truncated = true
+				}
+			}
+		}
+		cList[i].Specifics, _ = contractspecificservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		if cList[i].CodeOfert != "" {
+			cList[i].Offer, _ = offerrequestservice.FindOneByCompanyReeupAndOffer(cList[i].CodeCompany, cList[i].CodeReeup, cList[i].CodeOfert)
+		}
+
+		if truncated {
+			cList[i] = cList[len(cList)-1] // Copy last element to index i.
+			cList[len(cList)-1] = nil      // Erase last element (write zero value).
+			cList = cList[:len(cList)-1]   // Truncate slice.
+			i--
+		} else {
+			if cList[i].Supplements != nil && len(cList[i].Supplements) > 0 {
+				bigger := cList[i].ExpireAt
+				for j := 0; j < len(cList[i].Supplements); j++ {
+					if cList[i].Supplements[j].ExpireAt != nil {
+						if cList[i].Supplements[j].State == "Activo" {
+							if bigger.Before(*cList[i].Supplements[j].ExpireAt) {
+								bigger = cList[i].Supplements[j].ExpireAt
+							}
+						}
+					}
+				}
+				if bigger.Before(today) {
+					ended++
+				} else {
+					ending++
+				}
+			} else {
+				if cList[i].ExpireAt.Before(today) {
+					ended++
+				} else {
+					ending++
+				}
+			}
+		}
+
+	}
+	var cListResp models.ContractReponse
+	if total == "full" {
+		cListResp = models.ContractReponse{ContractList: cList, Ending: ending, Ended: ended}
+	} else {
+		cListResp = models.ContractReponse{Ending: ending, Ended: ended}
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(cListResp)
+
+}
+
+func GetContractsEndingSpecificDate(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	var codeCompany string = vars["codeCompany"]
+
+	var at models.At
+	err := json.NewDecoder(r.Body).Decode(&at)
+	if err != nil {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+
+	cList, total, founded := contractservice.FindByCodeCompanyAndSpecificDate(codeCompany, at.At)
+	if total == 0 {
+		errorservice.ErrorMessage(w, "No hay datos", 400)
+		return
+	}
+	if !founded {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+	for i := 0; i < len(cList); i++ {
+		cList[i].Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		cList[i].Specifics, _ = contractspecificservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		if cList[i].CodeOfert != "" {
+			cList[i].Offer, _ = offerrequestservice.FindOneByCompanyReeupAndOffer(cList[i].CodeCompany, cList[i].CodeReeup, cList[i].CodeOfert)
+		}
+
+	}
+
+	var cListResp models.ContractReponse = models.ContractReponse{Total: total, ContractList: cList}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(cListResp)
+
+}
+
+func TotalContractByCodeCompanyQueryClasif(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	var codeCompany string = vars["codeCompany"]
+
+	active, inactive := contractservice.TotalContractByCodeCompanyQueryClasif(codeCompany)
+
+	var Totals models.TotalContractDetailReponse = models.TotalContractDetailReponse{Active: active, Inactive: inactive}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(Totals)
+}
+
+// GetCodeContract
+func GetDaysByDefaultContract(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	var codeCompany string = vars["codeCompany"]
+
+	days := contractservice.GetDaysByDefaultContract(codeCompany)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(days)
 }
 
 // ------------------ UTILES----------------

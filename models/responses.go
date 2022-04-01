@@ -22,6 +22,8 @@ type ClientProviderReponse struct {
 type ContractReponse struct {
 	Total        int64       `json:"total"`
 	ContractList []*Contract `json:"contractList"`
+	Ending       int         `json:"ending"`
+	Ended        int         `json:"ended"`
 }
 
 // OfferRequestReponse => Cuerpo de respuesta la momento de devolver ofertas
@@ -54,4 +56,23 @@ type ObjectContractResponse struct {
 
 type SectorResponse struct {
 	SectortList []*Sector `json:"sectortList"`
+}
+
+type TotalContractDetailReponse struct {
+	Active   int64 `json:"active"`
+	Inactive int64 `json:"inactive"`
+}
+
+type StadisticsDetailReponse struct {
+	Ended   int64 `json:"ended"`
+	OutTerm int   `json:"outTerm"`
+	Active  int64 `json:"active"`
+	Total   int64 `json:"total"`
+}
+
+type StadisticsDetailTypeCoisReponse struct {
+	Cup   int64 `json:"cup"`
+	Mlc   int64 `json:"mlc"`
+	Ambas int64 `json:"ambas"`
+	Total int64 `json:"total"`
 }

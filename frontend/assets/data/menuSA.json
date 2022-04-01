@@ -1,0 +1,28 @@
+[
+  {
+    "text": "Inicio",
+    "icon": "home",
+    "routerLink": "/dashboard"
+  },
+  {
+    "text": "Administración",
+    "icon": "admin",
+    "children": [
+      {
+        "text": "Cliente/Proveedor",
+        "icon": "entity",
+        "routerLink": "/dashboard/clientprovider"
+      },
+      {
+        "text": "Nomencladores",
+        "icon": "archive",
+        "routerLink": "/dashboard/nomenclator"
+      },
+      {
+        "text": "Usuarios",
+        "icon": "users",
+        "routerLink": "/dashboard/users"
+      }
+    ]
+  }
+]

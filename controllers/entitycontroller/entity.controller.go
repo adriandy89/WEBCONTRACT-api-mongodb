@@ -5,8 +5,10 @@ import (
 	"WEBCONTRACT-api-mongodb/services/entityservice"
 	"WEBCONTRACT-api-mongodb/services/errorservice"
 	"WEBCONTRACT-api-mongodb/services/messageservice"
+	"WEBCONTRACT-api-mongodb/services/userservice"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -67,6 +69,12 @@ func EntityRegister(w http.ResponseWriter, r *http.Request) {
 			errorservice.ErrorMessage(w, "Error en registro en la base de datos"+errr.Error(), 500)
 			return
 		} else {
+			var user models.User = models.User{Username: "informatico" + entity.CodeCompany, Password: "informatico", State: 1, Name: "Genérico (Informático)", Rol: "Admin", CodeCompany: entity.CodeCompany, CreatedAt: time.Now(), ExpireAt: time.Date(time.Now().Year()+50, time.December, 10, 0, 0, 0, 0, time.UTC)}
+			var userFounded bool = userservice.ValidateIfUserExistByUsername(user.Username)
+			if !userFounded {
+				userservice.InsertNewUser(user)
+			}
+
 			messageservice.SuccesMessage(w, "Entidad creada correctamente", 200)
 			return
 		}

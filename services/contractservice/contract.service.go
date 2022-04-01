@@ -278,3 +278,108 @@ func GetNewCodeContract(codeCompany string, year string) ([]string, bool) {
 	}
 	return list, true
 }
+
+// FindByCodeCompanyAndDate   ---------- TotalContractQuery() --- concurrentes
+func FindByCodeCompanyAndDate(codeCompany string) ([]*models.Contract, bool) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	condition := bson.M{"codeCompany": codeCompany, "state": "Vigente", "expireAt": bson.M{"$lt": time.Now().Add(360 * time.Hour)}}
+	var contracts []*models.Contract
+
+	cursor, err := db.ContractCollection.Find(ctx, condition, options.Find().SetSort(bson.M{"clientProviderName": 1}))
+
+	if err != nil {
+		return contracts, false
+	}
+	err = cursor.Err()
+	if err != nil {
+		return contracts, false
+	}
+
+	defer cursor.Close(context.Background())
+	for cursor.Next(context.Background()) {
+		var contract models.Contract
+		err := cursor.Decode(&contract)
+		if err != nil {
+			return contracts, false
+		}
+		//contract.ClientProviderName, _ = clientproviderservice.FindNameByCustID(contract.CodeReeup)
+		contracts = append(contracts, &contract)
+	}
+	return contracts, true
+}
+
+// FindByCodeCompanyAndDate   ---------- TotalContractQuery() --- concurrentes
+func FindByCodeCompanyAndSpecificDate(codeCompany string, at *time.Time) ([]*models.Contract, int64, bool) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	c := make(chan int64)
+
+	condition := bson.M{"codeCompany": codeCompany, "createdAt": bson.M{"$gte": at}}
+	var contracts []*models.Contract
+
+	cursor, err := db.ContractCollection.Find(ctx, condition)
+
+	if err != nil {
+		return contracts, 0, false
+	}
+	err = cursor.Err()
+	if err != nil {
+		return contracts, 0, false
+	}
+
+	go TotalContractByCodeCompanyQuery(c, codeCompany)
+
+	defer cursor.Close(context.Background())
+	for cursor.Next(context.Background()) {
+		var contract models.Contract
+		err := cursor.Decode(&contract)
+		if err != nil {
+			return contracts, 0, false
+		}
+		//contract.ClientProviderName, _ = clientproviderservice.FindNameByCustID(contract.CodeReeup)
+		contracts = append(contracts, &contract)
+	}
+	return contracts, <-c, true
+}
+
+func TotalContractByCodeCompanyQueryClasif(code string) (int64, int64) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	condition := bson.M{"codeCompany": code, "state": "Vigente"}
+	condition2 := bson.M{"codeCompany": code, "state": "Terminado"}
+
+	active, err := db.ContractCollection.CountDocuments(ctx, condition)
+	if err != nil {
+		return 0, 0
+	}
+	inactive, err2 := db.ContractCollection.CountDocuments(ctx, condition2)
+	if err2 != nil {
+		return 0, 0
+	}
+
+	return active, inactive
+
+}
+
+// GetDaysByDefaultContract
+func GetDaysByDefaultContract(codeCompany string) int {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	condition := bson.M{"codeCompany": codeCompany}
+	condition2 := bson.M{"range": 1}
+	var rang models.Entity
+	days := 0
+	err := db.EntityCollection.FindOne(ctx, condition, options.FindOne().SetProjection(condition2)).Decode(&rang)
+	if err == nil {
+		days = rang.Range
+	}
+	return days
+}

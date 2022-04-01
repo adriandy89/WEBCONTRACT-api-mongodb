@@ -179,3 +179,15 @@ func UpdateOfferRequestByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func TotalOffersByCodeCompanyQueryClasif(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	var codeCompany string = vars["codeCompany"]
+
+	active, inactive := offerrequestservice.TotalOffersByCodeCompanyQueryClasif(codeCompany)
+
+	var Totals models.TotalContractDetailReponse = models.TotalContractDetailReponse{Active: active, Inactive: inactive}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(Totals)
+}

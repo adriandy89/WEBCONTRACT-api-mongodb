@@ -1,0 +1,24 @@
+
+Crear contratos
+
+Hay que controlar en la "Fecha de Firma" que no se pueda poner una fecha superior a la del día   --------- OK
+
+Hay que controlar en la "Fecha de Vencimiento" que genere una alerta si la fecha añadida supera la definida en el nomenclador "Vencimiento del Contrato", esto te lo había pasado hace unos días por correo. Es solo una alerta para que usuario conozca que esta poniendo una fecha que excede lo que la entidad tiene regulado para el vencimiento de los contratos.
+
+No veo opción para eliminar una Fecha de Vencimiento que haya que quitar porque se añadió mal   --------- OK
+
+Opción de Adjuntos. Cuando se añade dice "Progreso" pero no define si el adjunto se subió o no, tienes que dar Actualizar y acceder al contrato para saber si el adjunto se salvó o no ----> Sino se suben los adjuntos el contrato no se crea y te muestra un error.
+
+Sugiero cambiar el botón "Actualizar" por "Salvar" para que sea similar a la anterior versión   --------- OK
+
+La opción de "Editar" esta muy lenta a modo local en mi PC así que a nivel de servidores centrales en Datacimex sería mucho mas lento. Creo que la lentitud esta en que a la hora de editar esta listando todos los contratos añadidos debajo del que se edita y eso no es necesario.   --------- ??? --- Probar por la Red desde mi PC
+
+No veo los cambios en los importes totales del contrato, cuando se añaden adjuntos que modifican su valor.   --------- OK
+La opción de "Terminar el Contrato" en la la lista desplegable que muestra, poner la opción de Vigente de última en la lista   --------- OK
+
+ 
+
+
+
+
+

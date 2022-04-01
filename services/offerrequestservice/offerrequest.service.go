@@ -207,3 +207,23 @@ func TotalOfferByCodeCompanyQuery(c chan int64, code string) {
 		c <- cursor
 	}
 }
+
+func TotalOffersByCodeCompanyQueryClasif(code string) (int64, int64) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	condition := bson.M{"codeCompany": code, "state": "Activo"}
+	condition2 := bson.M{"codeCompany": code, "state": "Inactivo"}
+
+	active, err := db.OffersRequestsCollection.CountDocuments(ctx, condition)
+	if err != nil {
+		return 0, 0
+	}
+	inactive, err2 := db.OffersRequestsCollection.CountDocuments(ctx, condition2)
+	if err2 != nil {
+		return 0, 0
+	}
+
+	return active, inactive
+
+}

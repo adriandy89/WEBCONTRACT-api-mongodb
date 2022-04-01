@@ -140,6 +140,7 @@ func UpdateByID(id string, cUpdate models.Entity) (int64, error) {
 		"prefix":      cUpdate.Prefix,
 		"companyName": cUpdate.CompanyName,
 		"codeFather":  cUpdate.CodeFather,
+		"range":       cUpdate.Range,
 	}}
 
 	upd, err := db.EntityCollection.UpdateOne(ctx, condition, update)

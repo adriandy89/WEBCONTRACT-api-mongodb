@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 // FindCodeContractSpecific => Estructura de la solicitud de un nuevo codigo
 type FindCodeContractSpecific struct {
 	CodeContract string `bson:"codeContract" json:"codeContract"`
@@ -8,4 +10,8 @@ type FindCodeContractSpecific struct {
 
 type Word struct {
 	Word string `bson:"word" json:"word"`
+}
+
+type At struct {
+	At *time.Time `bson:"at" json:"at"`
 }

@@ -73,6 +73,7 @@ type Entity struct {
 	Prefix      string             `bson:"prefix,omitempty" json:"prefix,omitempty"`
 	CompanyName string             `bson:"companyName,omitempty" json:"companyName,omitempty"`
 	CodeFather  string             `bson:"codeFather,omitempty" json:"codeFather,omitempty"`
+	Range       int                `bson:"range" json:"range"`
 }
 
 // UserRol => Estructura de Roles de Usuarios
@@ -109,6 +110,8 @@ type OfferRequest struct {
 	CodeCompany        string             `bson:"codeCompany,omitempty" json:"codeCompany,omitempty"`
 	FileRoute          []string           `bson:"fileRoute,omitempty" json:"fileRoute,omitempty"`
 	ClientProviderName string             `bson:"clientProviderName,omitempty" json:"clientProviderName,omitempty"`
+	InsertedBy         string             `bson:"insertedBy,omitempty" json:"insertedBy,omitempty"`
+	LastUpdatedBy      string             `bson:"lastUpdatedBy,omitempty" json:"lastUpdatedBy,omitempty"`
 }
 
 // SupplementOperation => Estructura de las diferentes operaciones de los suplementos
@@ -140,6 +143,8 @@ type Supplement struct {
 	OperationMN    int                `bson:"operationMN,omitempty" json:"operationMN,omitempty"`
 	OperationCUC   string             `bson:"operationCUC,omitempty" json:"operationCUC,omitempty"`
 	CodeCompany    string             `bson:"codeCompany,omitempty" json:"codeCompany,omitempty"`
+	InsertedBy     string             `bson:"insertedBy,omitempty" json:"insertedBy,omitempty"`
+	LastUpdatedBy  string             `bson:"lastUpdatedBy,omitempty" json:"lastUpdatedBy,omitempty"`
 	FileRoute      []string           `bson:"fileRoute,omitempty" json:"fileRoute,omitempty"`
 }
 
@@ -159,6 +164,8 @@ type SupplementSpecific struct {
 	OperationMN    int                `bson:"operationMN,omitempty" json:"operationMN,omitempty"`
 	OperationCUC   string             `bson:"operationCUC,omitempty" json:"operationCUC,omitempty"`
 	CodeCompany    string             `bson:"codeCompany,omitempty" json:"codeCompany,omitempty"`
+	InsertedBy     string             `bson:"insertedBy,omitempty" json:"insertedBy,omitempty"`
+	LastUpdatedBy  string             `bson:"lastUpdatedBy,omitempty" json:"lastUpdatedBy,omitempty"`
 	FileRoute      []string           `bson:"fileRoute,omitempty" json:"fileRoute,omitempty"`
 }
 
@@ -202,6 +209,8 @@ type Contract struct {
 	AmmountMNInit           float32             `bson:"ammountMNInit,omitempty" json:"ammountMNInit,omitempty"`
 	FileRoute               []string            `bson:"fileRoute,omitempty" json:"fileRoute,omitempty"`
 	ClientProviderName      string              `bson:"clientProviderName,omitempty" json:"clientProviderName,omitempty"`
+	InsertedBy              string              `bson:"insertedBy,omitempty" json:"insertedBy,omitempty"`
+	LastUpdatedBy           string              `bson:"lastUpdatedBy,omitempty" json:"lastUpdatedBy,omitempty"`
 	Supplements             []*Supplement       `bson:"supplements,omitempty" json:"supplements,omitempty"`
 	Specifics               []*ContractSpecific `bson:"specifics,omitempty" json:"specifics,omitempty"`
 	Offer                   *OfferRequest       `bson:"offer,omitempty" json:"offer,omitempty"`
@@ -245,6 +254,8 @@ type ContractSpecific struct {
 	AmmountMNInit           float32               `bson:"ammountMNInit,omitempty" json:"ammountMNInit,omitempty"`
 	FileRoute               []string              `bson:"fileRoute,omitempty" json:"fileRoute,omitempty"`
 	ClientProviderName      string                `bson:"clientProviderName,omitempty" json:"clientProviderName,omitempty"`
+	InsertedBy              string                `bson:"insertedBy,omitempty" json:"insertedBy,omitempty"`
+	LastUpdatedBy           string                `bson:"lastUpdatedBy,omitempty" json:"lastUpdatedBy,omitempty"`
 	SupplementSpecific      []*SupplementSpecific `bson:"supplementSpecific,omitempty" json:"supplementSpecific,omitempty"`
 }
 

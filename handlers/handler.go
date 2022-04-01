@@ -39,6 +39,7 @@ func Handlers() {
 	routers.TypeFactRoutes(router)
 	routers.SectorRoutes(router)
 	routers.FilesRoutes(router)
+	routers.StadisticRoutes(router)
 
 	//router.PathPrefix("/").Handler(http.FileServer(http.Dir("./frontend"))).Methods("GET")
 
