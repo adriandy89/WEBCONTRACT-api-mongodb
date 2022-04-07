@@ -62,7 +62,7 @@ func FindByUsername(username string) (models.User, bool) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	condition := bson.M{"username": username}
+	condition := bson.M{"username": username, "state": 1}
 
 	var userFounded models.User
 

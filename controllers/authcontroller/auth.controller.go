@@ -25,7 +25,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	userLogged, exist := authservice.Login(user.Username, user.Password)
 	if !exist {
-		errorservice.ErrorMessage(w, "Usuario y/o contraseña invalidos", 403)
+		errorservice.ErrorMessage(w, "Credenciales Invalidas ó Inactivo!", 403)
 		return
 	}
 

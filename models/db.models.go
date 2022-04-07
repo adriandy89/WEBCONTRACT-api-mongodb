@@ -206,6 +206,7 @@ type Contract struct {
 	NonCompliance           []NonCompliance     `bson:"nonCompliance,omitempty" json:"nonCompliance,omitempty"`
 	PaymentTerm             int                 `bson:"paymentTerm,omitempty" json:"paymentTerm,omitempty"`
 	CodeCategory            string              `bson:"codeCategory,omitempty" json:"codeCategory,omitempty"`
+	CodeCategoryInitial     string              `bson:"codeCategoryInitial,omitempty" json:"codeCategoryInitial,omitempty"`
 	AmmountMNInit           float32             `bson:"ammountMNInit,omitempty" json:"ammountMNInit,omitempty"`
 	FileRoute               []string            `bson:"fileRoute,omitempty" json:"fileRoute,omitempty"`
 	ClientProviderName      string              `bson:"clientProviderName,omitempty" json:"clientProviderName,omitempty"`

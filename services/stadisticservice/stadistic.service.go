@@ -99,7 +99,7 @@ func FindActivesByCodeCompanyGroupBy(codeCompany string) ([]*models.Contract, bo
 	condition := bson.M{"codeCompany": codeCompany, "state": "Vigente"}
 	var contracts []*models.Contract
 
-	cursor, err := db.ContractCollection.Find(ctx, condition, options.Find().SetSort(bson.M{"clientProviderName": 1}).SetProjection(bson.M{"clientProviderName": 1}))
+	cursor, err := db.ContractCollection.Find(ctx, condition, options.Find().SetSort(bson.M{"clientProviderName": 1}).SetProjection(bson.M{"clientProviderName": 1, "codeCategoryInitial": 1}))
 
 	if err != nil {
 		return contracts, false
@@ -120,4 +120,37 @@ func FindActivesByCodeCompanyGroupBy(codeCompany string) ([]*models.Contract, bo
 		contracts = append(contracts, &contract)
 	}
 	return contracts, true
+}
+
+//------------ Range od Dates
+
+func TotalTypeCoisByCodeCompanyXDate(code string, start *time.Time, end *time.Time) (int64, int64, int64) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	condition := bson.M{
+		"codeCompany": code,
+		"createdAt":   bson.M{"$gte": start, "$lt": end},
+		"$or": []bson.M{
+			bson.M{"codeTypeCoin": "CUC"},
+			bson.M{"codeTypeCoin": "MN"},
+		},
+	}
+	condition2 := bson.M{"codeCompany": code, "codeTypeCoin": "MLC", "createdAt": bson.M{"$gte": start, "$lt": end}}
+	condition3 := bson.M{"codeCompany": code, "codeTypeCoin": "AMBAS", "createdAt": bson.M{"$gte": start, "$lt": end}}
+
+	cup, err := db.ContractCollection.CountDocuments(ctx, condition)
+	if err != nil {
+		return 0, 0, 0
+	}
+	mlc, err2 := db.ContractCollection.CountDocuments(ctx, condition2)
+	if err2 != nil {
+		return 0, 0, 0
+	}
+	ambas, err3 := db.ContractCollection.CountDocuments(ctx, condition3)
+	if err3 != nil {
+		return 0, 0, 0
+	}
+
+	return cup, mlc, ambas
 }

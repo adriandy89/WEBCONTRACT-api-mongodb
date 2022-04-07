@@ -199,7 +199,7 @@ func FindByNameOrCode(count int, order string, typ string, page int, word string
 	go TotalClientProviderQueryByWord(c, word)
 	var clientProviders []*models.ClientProvider
 	cursor, err := db.ClientProviderCollection.Find(ctx,
-		bson.M{
+		bson.M{"statusCode": "Activo",
 			"$or": []bson.M{
 				bson.M{"name": bson.M{"$regex": word, "$options": "im"}},
 				bson.M{"custId": bson.M{"$regex": word, "$options": "im"}},

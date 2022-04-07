@@ -66,6 +66,26 @@ func TotalTypeCoisByCodeCompany(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(cListResp)
 
 }
+func TotalTypeCoisByCodeCompanyXDate(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	var codeCompany string = vars["codeCompany"]
+
+	var rangeDate models.TimeRange
+	err := json.NewDecoder(r.Body).Decode(&rangeDate)
+	if err != nil {
+		errorservice.ErrorMessage(w, "Error en la validacion de datos", 400)
+		return
+	}
+
+	cup, mlc, ambas := stadisticservice.TotalTypeCoisByCodeCompanyXDate(codeCompany, rangeDate.Start, rangeDate.End)
+
+	cListResp := models.StadisticsDetailTypeCoisReponse{Cup: cup, Mlc: mlc, Ambas: ambas, Total: cup + mlc + ambas}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(cListResp)
+
+}
 
 func GetContractsClientProviderName(w http.ResponseWriter, r *http.Request) {
 

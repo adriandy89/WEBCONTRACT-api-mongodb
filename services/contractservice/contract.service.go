@@ -223,6 +223,7 @@ func UpdateByID(id string, cUpdate models.Contract) (int64, error) {
 		"commentDescriptionState": cUpdate.CommentDescriptionState,
 		"paymentTerm":             cUpdate.PaymentTerm,
 		"codeCategory":            cUpdate.CodeCategory,
+		"codeCategoryInitial":     cUpdate.CodeCategoryInitial,
 		"ammountMNInit":           cUpdate.AmmountMNInit,
 		"fileRoute":               cUpdate.FileRoute,
 		"supplements":             cUpdate.Supplements,
@@ -285,7 +286,7 @@ func FindByCodeCompanyAndDate(codeCompany string) ([]*models.Contract, bool) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	condition := bson.M{"codeCompany": codeCompany, "state": "Vigente", "expireAt": bson.M{"$lt": time.Now().Add(360 * time.Hour)}}
+	condition := bson.M{"codeCompany": codeCompany, "state": "Vigente", "expireAt": bson.M{"$lt": time.Now().Add(2880 * time.Hour)}}
 	var contracts []*models.Contract
 
 	cursor, err := db.ContractCollection.Find(ctx, condition, options.Find().SetSort(bson.M{"clientProviderName": 1}))

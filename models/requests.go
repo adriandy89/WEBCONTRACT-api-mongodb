@@ -15,3 +15,8 @@ type Word struct {
 type At struct {
 	At *time.Time `bson:"at" json:"at"`
 }
+
+type TimeRange struct {
+	Start *time.Time `bson:"start" json:"start"`
+	End   *time.Time `bson:"end" json:"end"`
+}

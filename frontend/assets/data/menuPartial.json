@@ -5,6 +5,11 @@
     "routerLink": "/dashboard"
   },
   {
+    "text": "Informes",
+    "icon": "information",
+    "routerLink": "/dashboard/reports"
+  },
+  {
     "text": "Ofertas",
     "icon": "offer",
     "routerLink": "/dashboard/offers"
@@ -26,23 +31,7 @@
       {
         "text": "Alertas",
         "icon": "alert",
-        "routerLink": "/dashboard/b"
-      }
-    ]
-  },
-  {
-    "text": "Informes",
-    "icon": "information",
-    "children": [
-      {
-        "text": "Graficos",
-        "icon": "add",
-        "routerLink": "/product/category"
-      },
-      {
-        "text": "Otros",
-        "icon": "add",
-        "routerLink": "/product/sub-category"
+        "routerLink": "/dashboard/alerts"
       }
     ]
   },
