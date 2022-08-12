@@ -4,6 +4,7 @@ import (
 	"WEBCONTRACT-api-mongodb/models"
 	"WEBCONTRACT-api-mongodb/services/contractservice"
 	contractspecificservice "WEBCONTRACT-api-mongodb/services/contractspecific.service.go"
+	"WEBCONTRACT-api-mongodb/services/entityservice"
 	"WEBCONTRACT-api-mongodb/services/errorservice"
 	"WEBCONTRACT-api-mongodb/services/messageservice"
 	offerrequestservice "WEBCONTRACT-api-mongodb/services/offerRequestservice"
@@ -32,7 +33,7 @@ func GetContracts(w http.ResponseWriter, r *http.Request) {
 		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
 		return
 	}
-	cList, total, founded := contractservice.FindByCountAndSort(codeCompany, number, order, typ, numberPage)
+	cList, total, founded := contractservice.FindByCountAndSort(codeCompany, number, order, typ, numberPage, "")
 	if total == 0 {
 		errorservice.ErrorMessage(w, "No hay datos", 400)
 		return
@@ -47,14 +48,48 @@ func GetContracts(w http.ResponseWriter, r *http.Request) {
 		if cList[i].CodeOfert != "" {
 			cList[i].Offer, _ = offerrequestservice.FindOneByCompanyReeupAndOffer(cList[i].CodeCompany, cList[i].CodeReeup, cList[i].CodeOfert)
 		}
-
 	}
 
 	var cListResp models.ContractReponse = models.ContractReponse{Total: total, ContractList: cList}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(cListResp)
+}
+func GetContractsVigent(w http.ResponseWriter, r *http.Request) {
 
+	vars := mux.Vars(r)
+	var codeCompany string = vars["codeCompany"]
+	var count string = vars["count"]
+	var order string = vars["order"]
+	var typ string = vars["typ"]
+	var page string = vars["page"]
+	number, err := strconv.Atoi(count)
+	numberPage, err1 := strconv.Atoi(page)
+	if number <= 0 || numberPage <= 0 || err != nil || err1 != nil || order == "" || typ == "" {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+	cList, total, founded := contractservice.FindByCountAndSort(codeCompany, number, order, typ, numberPage, "Vigente")
+	if total == 0 {
+		errorservice.ErrorMessage(w, "No hay datos", 400)
+		return
+	}
+	if !founded {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+	for i := 0; i < len(cList); i++ {
+		cList[i].Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		cList[i].Specifics, _ = contractspecificservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		if cList[i].CodeOfert != "" {
+			cList[i].Offer, _ = offerrequestservice.FindOneByCompanyReeupAndOffer(cList[i].CodeCompany, cList[i].CodeReeup, cList[i].CodeOfert)
+		}
+	}
+
+	var cListResp models.ContractReponse = models.ContractReponse{Total: total, ContractList: cList}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(cListResp)
 }
 
 func GetContractsByWord(w http.ResponseWriter, r *http.Request) {
@@ -79,11 +114,59 @@ func GetContractsByWord(w http.ResponseWriter, r *http.Request) {
 		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
 		return
 	}
-	cList, total, founded := contractservice.FindByNameOrCode(codeCompany, number, order, typ, numberPage, word.Word)
+	cList, total, founded := contractservice.FindByNameOrCode(codeCompany, number, order, typ, numberPage, word.Word, "")
 
 	if !founded {
 		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
 		return
+	}
+	for i := 0; i < len(cList); i++ {
+		cList[i].Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		cList[i].Specifics, _ = contractspecificservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		if cList[i].CodeOfert != "" {
+			cList[i].Offer, _ = offerrequestservice.FindOneByCompanyReeupAndOffer(cList[i].CodeCompany, cList[i].CodeReeup, cList[i].CodeOfert)
+		}
+	}
+
+	var cListResp models.ContractReponse = models.ContractReponse{Total: total, ContractList: cList}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(cListResp)
+}
+func GetContractsVigentByWord(w http.ResponseWriter, r *http.Request) {
+
+	var word models.Word
+
+	err := json.NewDecoder(r.Body).Decode(&word)
+	if err != nil {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+
+	vars := mux.Vars(r)
+	var codeCompany string = vars["codeCompany"]
+	var count string = vars["count"]
+	var order string = vars["order"]
+	var typ string = vars["typ"]
+	var page string = vars["page"]
+	number, err := strconv.Atoi(count)
+	numberPage, err1 := strconv.Atoi(page)
+	if number <= 0 || numberPage <= 0 || err != nil || err1 != nil || order == "" || typ == "" || word.Word == "" {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+	cList, total, founded := contractservice.FindByNameOrCode(codeCompany, number, order, typ, numberPage, word.Word, "Vigente")
+
+	if !founded {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+	for i := 0; i < len(cList); i++ {
+		cList[i].Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		cList[i].Specifics, _ = contractspecificservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		if cList[i].CodeOfert != "" {
+			cList[i].Offer, _ = offerrequestservice.FindOneByCompanyReeupAndOffer(cList[i].CodeCompany, cList[i].CodeReeup, cList[i].CodeOfert)
+		}
 	}
 
 	var cListResp models.ContractReponse = models.ContractReponse{Total: total, ContractList: cList}
@@ -371,6 +454,45 @@ func GetContractsEnding(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(cListResp)
 
 }
+func GetContractsEndingEXCEL(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	var codeCompany string = vars["codeCompany"]
+
+	cList, founded := contractservice.FindByCodeCompanyAndDateEXCEL(codeCompany)
+
+	if !founded {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+	for i := 0; i < len(cList); i++ {
+
+		cList[i].Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeupEXCEL(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		truncated := false
+		for j := 0; j < len(cList[i].Supplements); j++ {
+			if cList[i].Supplements[j].ExpireAt != nil {
+				if cList[i].Supplements[j].ExpireAt.After(time.Now().Add(360*time.Hour)) && cList[i].Supplements[j].State == "Activo" {
+					truncated = true
+				}
+			}
+		}
+
+		if truncated {
+			cList[i] = cList[len(cList)-1] // Copy last element to index i.
+			cList[len(cList)-1] = nil      // Erase last element (write zero value).
+			cList = cList[:len(cList)-1]   // Truncate slice.
+			i--
+		}
+
+	}
+	var cListResp models.ContractEXCELResponse
+	cListResp = models.ContractEXCELResponse{ContractList: cList}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(cListResp)
+
+}
 
 func GetContractsEndingSpecificDate(w http.ResponseWriter, r *http.Request) {
 
@@ -489,4 +611,376 @@ func removeDuplicateElement(addrs []int) []int {
 		}
 	}
 	return result
+}
+
+//
+// Stadistics
+//
+func GetContractsStadistic(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	var codeCompany string = vars["codeCompany"]
+	var count string = vars["count"]
+	var order string = vars["order"]
+	var typ string = vars["typ"]
+	var page string = vars["page"]
+	var filter string = vars["filter"]
+	number, err := strconv.Atoi(count)
+	numberPage, err1 := strconv.Atoi(page)
+	if number <= 0 || numberPage <= 0 || err != nil || err1 != nil || order == "" || typ == "" || filter == "" {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+	cList, total, founded := contractservice.FindByCountAndSortStadistic(codeCompany, number, order, typ, numberPage, filter)
+	if total == 0 {
+		errorservice.ErrorMessage(w, "No hay datos", 400)
+		return
+	}
+	if !founded {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+	for i := 0; i < len(cList); i++ {
+		cList[i].Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		cList[i].Specifics, _ = contractspecificservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		if cList[i].CodeOfert != "" {
+			cList[i].Offer, _ = offerrequestservice.FindOneByCompanyReeupAndOffer(cList[i].CodeCompany, cList[i].CodeReeup, cList[i].CodeOfert)
+		}
+
+	}
+
+	var cListResp models.ContractReponse = models.ContractReponse{Total: total, ContractList: cList}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(cListResp)
+
+}
+
+func GetContractsStadisticAll(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	var codeCompany string = vars["codeCompany"]
+	var filter string = vars["filter"]
+	if filter == "" {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+	var rol string = r.Header.Get("rol")
+	var cList []*models.Contract
+	var founded bool
+	var companies []string
+
+	if rol == "Revisor" {
+		// rol Revisor -----------------------------------
+		eList, err := entityservice.FindAllEntitiesCodeCompany()
+		if err != nil {
+			errorservice.ErrorMessage(w, "Invalidos: "+err.Error(), 400)
+			return
+		}
+		if len(eList) <= 0 {
+			errorservice.ErrorMessage(w, "No hay datos", 400)
+			return
+		}
+
+		arrg := make([]models.Tree, 0)
+		for i := 0; i < len(eList); i++ {
+			arrg = append(arrg, models.Tree{CodeCompany: eList[i].CodeCompany, CodeFather: eList[i].CodeFather})
+		}
+		companies = append(companies, codeCompany)
+		for j := 0; j < len(companies); j++ {
+			for k := 0; k < len(arrg); k++ {
+				if companies[j] == arrg[k].CodeFather {
+					companies = append(companies, arrg[k].CodeCompany)
+				}
+			}
+		}
+
+		for l := 0; l < len(companies); l++ {
+			cListT, _ := contractservice.FindByCountAndSortStadisticAll(companies[l], "Vencidos")
+			for k := 0; k < len(cListT); k++ {
+				cList = append(cList, cListT[k])
+			}
+
+		}
+
+	} else {
+
+		cList, founded = contractservice.FindByCountAndSortStadisticAll(codeCompany, "Vencidos")
+
+		if len(cList) == 0 {
+			errorservice.ErrorMessage(w, "No hay datos", 400)
+			return
+		}
+		if !founded {
+			errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+			return
+		}
+	}
+
+	for i := 0; i < len(cList); i++ {
+
+		cList[i].Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		truncated := false
+		for j := 0; j < len(cList[i].Supplements); j++ {
+			if cList[i].Supplements[j].ExpireAt != nil {
+				if cList[i].Supplements[j].ExpireAt.After(time.Now().Add(-24*time.Hour)) && cList[i].Supplements[j].State == "Activo" {
+					truncated = true
+				}
+			}
+		}
+
+		if truncated {
+			cList[i] = cList[len(cList)-1] // Copy last element to index i.
+			cList[len(cList)-1] = nil      // Erase last element (write zero value).
+			cList = cList[:len(cList)-1]   // Truncate slice.
+			i--
+		}
+	}
+	if filter == "SuplementVenc" && len(cList) > 0 {
+		for q := 0; q < len(cList); q++ {
+			if cList[q].Supplements == nil || len(cList[q].Supplements) <= 0 {
+				cList[q] = cList[len(cList)-1] // Copy last element to index i.
+				cList[len(cList)-1] = nil      // Erase last element (write zero value).
+				cList = cList[:len(cList)-1]   // Truncate slice.
+				q--
+			}
+		}
+	}
+	var cListVigF []*models.Contract
+	if filter == "Vigentes" || filter == "SuplementVig" || filter == "Incumpl" {
+		if rol == "Revisor" {
+			for l := 0; l < len(companies); l++ {
+				cListT, _ := contractservice.FindByCountAndSortStadisticAll(companies[l], filter)
+				for k := 0; k < len(cListT); k++ {
+					cListVigF = append(cListVigF, cListT[k])
+				}
+			}
+		} else {
+			cListVigF, founded = contractservice.FindByCountAndSortStadisticAll(codeCompany, filter)
+		}
+		for k := 0; k < len(cList); k++ {
+			for m := 0; m < len(cListVigF); m++ {
+				if cList[k] != nil && cListVigF[m] != nil {
+					if cList[k].CodeContract == cListVigF[m].CodeContract {
+						cListVigF[m] = cListVigF[len(cListVigF)-1] // Copy last element to index i.
+						cListVigF[len(cListVigF)-1] = nil          // Erase last element (write zero value).
+						cListVigF = cListVigF[:len(cListVigF)-1]   // Truncate slice.
+						m--
+					}
+				}
+			}
+		}
+		for h := 0; h < len(cListVigF); h++ {
+			if cListVigF[h] != nil {
+				cListVigF[h].Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeup(cListVigF[h].CodeCompany, cListVigF[h].CodeContract, cListVigF[h].CodeReeup)
+
+			}
+		}
+		if filter == "SuplementVig" {
+			for q := 0; q < len(cListVigF); q++ {
+				if cListVigF[q].Supplements == nil || len(cListVigF[q].Supplements) <= 0 {
+					cListVigF[q] = cListVigF[len(cListVigF)-1] // Copy last element to index i.
+					cListVigF[len(cListVigF)-1] = nil          // Erase last element (write zero value).
+					cListVigF = cListVigF[:len(cListVigF)-1]   // Truncate slice.
+					q--
+				}
+			}
+		} else if filter == "Incumpl" {
+			for q := 0; q < len(cListVigF); q++ {
+				if cListVigF[q].NonCompliance == nil || len(cListVigF[q].NonCompliance) <= 0 {
+					cListVigF[q] = cListVigF[len(cListVigF)-1] // Copy last element to index i.
+					cListVigF[len(cListVigF)-1] = nil          // Erase last element (write zero value).
+					cListVigF = cListVigF[:len(cListVigF)-1]   // Truncate slice.
+					q--
+				}
+			}
+		}
+	}
+
+	var cListResp models.ContractReponse
+	if filter == "Vigentes" || filter == "SuplementVig" || filter == "Incumpl" {
+		cListResp = models.ContractReponse{Total: int64(len(cListVigF)), ContractList: cListVigF}
+	} else {
+		cListResp = models.ContractReponse{Total: int64(len(cList)), ContractList: cList}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(cListResp)
+
+}
+
+func GetContractsStadisticAllEXCEL(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	var codeCompany string = vars["codeCompany"]
+	var filter string = vars["filter"]
+	if filter == "" {
+		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+		return
+	}
+
+	var cListResp models.ContractEXCELResponse
+	if filter == "Terminado" {
+		cList, founded := contractservice.FindByCountAndSortStadisticAllEXCEL(codeCompany, "Terminado")
+
+		if len(cList) == 0 {
+			errorservice.ErrorMessage(w, "No hay datos", 400)
+			return
+		}
+		if !founded {
+			errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+			return
+		}
+
+		for i := 0; i < len(cList); i++ {
+			cList[i].Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeupEXCEL(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+		}
+		cListResp = models.ContractEXCELResponse{ContractList: cList}
+	} else {
+
+		var cList []*models.ContractEXCEL
+		founded := true
+		var rol string = r.Header.Get("rol")
+		var companies []string
+		if rol == "Revisor" {
+			// rol Revisor -----------------------------------
+			eList, err := entityservice.FindAllEntitiesCodeCompany()
+			if err != nil {
+				errorservice.ErrorMessage(w, "Invalidos: "+err.Error(), 400)
+				return
+			}
+			if len(eList) <= 0 {
+				errorservice.ErrorMessage(w, "No hay datos", 400)
+				return
+			}
+
+			arrg := make([]models.Tree, 0)
+			for i := 0; i < len(eList); i++ {
+				arrg = append(arrg, models.Tree{CodeCompany: eList[i].CodeCompany, CodeFather: eList[i].CodeFather})
+			}
+			companies = append(companies, codeCompany)
+			for j := 0; j < len(companies); j++ {
+				for k := 0; k < len(arrg); k++ {
+					if companies[j] == arrg[k].CodeFather {
+						companies = append(companies, arrg[k].CodeCompany)
+					}
+				}
+			}
+
+			for l := 0; l < len(companies); l++ {
+				cListT, _ := contractservice.FindByCountAndSortStadisticAllEXCEL(companies[l], "Vencidos")
+				for k := 0; k < len(cListT); k++ {
+					cList = append(cList, cListT[k])
+				}
+
+			}
+
+		} else {
+
+			cList, founded = contractservice.FindByCountAndSortStadisticAllEXCEL(codeCompany, "Vencidos")
+
+			if len(cList) == 0 {
+				errorservice.ErrorMessage(w, "No hay datos", 400)
+				return
+			}
+			if !founded {
+				errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
+				return
+			}
+		}
+		for i := 0; i < len(cList); i++ {
+
+			cList[i].Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeupEXCEL(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+			truncated := false
+			for j := 0; j < len(cList[i].Supplements); j++ {
+				if cList[i].Supplements[j].ExpireAt != nil {
+					if cList[i].Supplements[j].ExpireAt.After(time.Now().Add(-24*time.Hour)) && cList[i].Supplements[j].State == "Activo" {
+						truncated = true
+					}
+				}
+			}
+
+			if truncated {
+				cList[i] = cList[len(cList)-1] // Copy last element to index i.
+				cList[len(cList)-1] = nil      // Erase last element (write zero value).
+				cList = cList[:len(cList)-1]   // Truncate slice.
+				i--
+			}
+		}
+		if filter == "SuplementVenc" && len(cList) > 0 {
+			for q := 0; q < len(cList); q++ {
+				if cList[q].Supplements == nil || len(cList[q].Supplements) <= 0 {
+					cList[q] = cList[len(cList)-1] // Copy last element to index i.
+					cList[len(cList)-1] = nil      // Erase last element (write zero value).
+					cList = cList[:len(cList)-1]   // Truncate slice.
+					q--
+				}
+			}
+		}
+		var cListVigF []*models.ContractEXCEL
+		if filter == "Vigentes" || filter == "SuplementVig" || filter == "Incumpl" {
+			if rol == "Revisor" {
+				for l := 0; l < len(companies); l++ {
+					cListT, _ := contractservice.FindByCountAndSortStadisticAllEXCEL(companies[l], filter)
+					for k := 0; k < len(cListT); k++ {
+						cListVigF = append(cListVigF, cListT[k])
+					}
+
+				}
+			} else {
+				cListVigF, founded = contractservice.FindByCountAndSortStadisticAllEXCEL(codeCompany, filter)
+			}
+
+			for k := 0; k < len(cList); k++ {
+				for m := 0; m < len(cListVigF); m++ {
+					if cList[k] != nil && cListVigF[m] != nil {
+						if cList[k].CodeContract == cListVigF[m].CodeContract {
+							cListVigF[m] = cListVigF[len(cListVigF)-1] // Copy last element to index i.
+							cListVigF[len(cListVigF)-1] = nil          // Erase last element (write zero value).
+							cListVigF = cListVigF[:len(cListVigF)-1]   // Truncate slice.
+							m--
+						}
+					}
+				}
+			}
+			for h := 0; h < len(cListVigF); h++ {
+				if cListVigF[h] != nil {
+					cListVigF[h].Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeupEXCEL(cListVigF[h].CodeCompany, cListVigF[h].CodeContract, cListVigF[h].CodeReeup)
+
+				}
+			}
+			if filter == "SuplementVig" {
+				for q := 0; q < len(cListVigF); q++ {
+					if cListVigF[q].Supplements == nil || len(cListVigF[q].Supplements) <= 0 {
+						cListVigF[q] = cListVigF[len(cListVigF)-1] // Copy last element to index i.
+						cListVigF[len(cListVigF)-1] = nil          // Erase last element (write zero value).
+						cListVigF = cListVigF[:len(cListVigF)-1]   // Truncate slice.
+						q--
+					}
+				}
+			} else if filter == "Incumpl" {
+				for q := 0; q < len(cListVigF); q++ {
+					if cListVigF[q].NonCompliance == nil || len(cListVigF[q].NonCompliance) <= 0 {
+						cListVigF[q] = cListVigF[len(cListVigF)-1] // Copy last element to index i.
+						cListVigF[len(cListVigF)-1] = nil          // Erase last element (write zero value).
+						cListVigF = cListVigF[:len(cListVigF)-1]   // Truncate slice.
+						q--
+					}
+				}
+			}
+		}
+
+		if filter == "Vigentes" || filter == "SuplementVig" || filter == "Incumpl" {
+			cListResp = models.ContractEXCELResponse{ContractList: cListVigF}
+		} else {
+			cListResp = models.ContractEXCELResponse{ContractList: cList}
+		}
+
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(cListResp)
+
 }

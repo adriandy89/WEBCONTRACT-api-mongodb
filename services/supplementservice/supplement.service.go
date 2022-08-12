@@ -8,7 +8,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // InsertNewSuplement
@@ -64,13 +63,38 @@ func FindAllByCodeCompanyContractReeup(codeCompany string, codeContract string, 
 	var results []*models.Supplement
 
 	condition := bson.M{"codeCompany": codeCompany, "codeContract": codeContract, "codeReeup": codeReeup}
-	cursor, err := db.SuplementCollection.Find(ctx, condition, options.Find().SetSort(bson.M{"codeSupplement": 1}))
+	cursor, err := db.SuplementCollection.Find(ctx, condition)
 	if err != nil {
 		return results, false
 	}
 
 	for cursor.Next(context.TODO()) {
 		var suplement models.Supplement
+		err := cursor.Decode(&suplement)
+		if err != nil {
+			return results, false
+		}
+		results = append(results, &suplement)
+	}
+
+	return results, true
+}
+
+func FindAllByCodeCompanyContractReeupEXCEL(codeCompany string, codeContract string, codeReeup string) ([]*models.SupplementEXCEL, bool) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	var results []*models.SupplementEXCEL
+
+	condition := bson.M{"codeCompany": codeCompany, "codeContract": codeContract, "codeReeup": codeReeup}
+	cursor, err := db.SuplementCollection.Find(ctx, condition)
+	if err != nil {
+		return results, false
+	}
+
+	for cursor.Next(context.TODO()) {
+		var suplement models.SupplementEXCEL
 		err := cursor.Decode(&suplement)
 		if err != nil {
 			return results, false
@@ -116,6 +140,7 @@ func UpdateByID(id string, cUpdate models.Supplement) (int64, error) {
 		"description":    cUpdate.Description,
 		"ammountMN":      cUpdate.AmmountMN,
 		"ammountCUC":     cUpdate.AmmountCUC,
+		"ammountMLC":     cUpdate.AmmountMLC,
 		"operationMN":    cUpdate.OperationMN,
 		"operationCUC":   cUpdate.OperationCUC,
 		"codeCompany":    cUpdate.CodeCompany,

@@ -163,3 +163,69 @@ func DeleteByID(id string) bool {
 	return delRes.DeletedCount > 0
 
 }
+
+//
+// Estadisticas
+//
+func GetCodeFather(code string) models.Entity {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	condition2 := bson.M{"codeCompany": code}
+	var result models.Entity
+
+	err := db.EntityCollection.FindOne(ctx, condition2, options.FindOne().SetProjection(bson.M{"codeFather": 1})).Decode(&result)
+	if err != nil {
+		return result
+	}
+	return result
+}
+
+func CountAllEntities() int64 {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	total, err := db.EntityCollection.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		total = 0
+	}
+	return total
+}
+
+func FindAllEntitiesCodeCompany() ([]*models.Entity, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	var entities []*models.Entity
+	cursor, err := db.EntityCollection.Find(ctx, bson.M{}, options.Find().SetProjection(bson.M{"codeCompany": 1, "codeFather": 1}).SetSort(bson.M{"codeCompany": 1}))
+	if err != nil {
+		return entities, err
+	}
+	err = cursor.Err()
+	if err != nil {
+		return entities, err
+	}
+	defer cursor.Close(context.Background())
+	for cursor.Next(context.Background()) {
+		var entity models.Entity
+		err := cursor.Decode(&entity)
+		if err != nil {
+			return entities, err
+		}
+		entities = append(entities, &entity)
+	}
+	return entities, nil
+}
+
+func FindCompanyName(codeCompany string) string {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	var result models.Entity
+
+	err := db.EntityCollection.FindOne(ctx, bson.M{"codeCompany": codeCompany}, options.FindOne().SetProjection(bson.M{"companyName": 1})).Decode(&result)
+	if err != nil {
+		return ""
+	}
+	return result.CompanyName
+}

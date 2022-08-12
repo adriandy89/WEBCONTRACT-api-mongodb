@@ -105,6 +105,7 @@ type OfferRequest struct {
 	CreatedAt          *time.Time         `bson:"createdAt,omitempty" json:"createdAt,omitempty"`
 	AmmountMN          float32            `bson:"ammountMN,omitempty" json:"ammountMN,omitempty"`
 	AmmountCUC         float32            `bson:"ammountCUC,omitempty" json:"ammountCUC,omitempty"`
+	AmmountMLC         float32            `bson:"ammountMLC,omitempty" json:"ammountMLC,omitempty"`
 	State              string             `bson:"state,omitempty" json:"state,omitempty"`
 	Description        string             `bson:"description,omitempty" json:"description,omitempty"`
 	CodeCompany        string             `bson:"codeCompany,omitempty" json:"codeCompany,omitempty"`
@@ -140,6 +141,7 @@ type Supplement struct {
 	Description    string             `bson:"description,omitempty" json:"description,omitempty"`
 	AmmountMN      float32            `bson:"ammountMN,omitempty" json:"ammountMN,omitempty"`
 	AmmountCUC     float32            `bson:"ammountCUC,omitempty" json:"ammountCUC,omitempty"`
+	AmmountMLC     float32            `bson:"ammountMLC,omitempty" json:"ammountMLC,omitempty"`
 	OperationMN    int                `bson:"operationMN,omitempty" json:"operationMN,omitempty"`
 	OperationCUC   string             `bson:"operationCUC,omitempty" json:"operationCUC,omitempty"`
 	CodeCompany    string             `bson:"codeCompany,omitempty" json:"codeCompany,omitempty"`
@@ -161,6 +163,7 @@ type SupplementSpecific struct {
 	Description    string             `bson:"description,omitempty" json:"description,omitempty"`
 	AmmountMN      float32            `bson:"ammountMN,omitempty" json:"ammountMN,omitempty"`
 	AmmountCUC     float32            `bson:"ammountCUC,omitempty" json:"ammountCUC,omitempty"`
+	AmmountMLC     float32            `bson:"ammountMLC,omitempty" json:"ammountMLC,omitempty"`
 	OperationMN    int                `bson:"operationMN,omitempty" json:"operationMN,omitempty"`
 	OperationCUC   string             `bson:"operationCUC,omitempty" json:"operationCUC,omitempty"`
 	CodeCompany    string             `bson:"codeCompany,omitempty" json:"codeCompany,omitempty"`
@@ -189,6 +192,7 @@ type Contract struct {
 	State                   string              `bson:"state,omitempty" json:"state,omitempty"`
 	AmmountMN               float32             `bson:"ammountMN,omitempty" json:"ammountMN,omitempty"`
 	AmmountCUC              float32             `bson:"ammountCUC,omitempty" json:"ammountCUC,omitempty"`
+	AmmountMLC              float32             `bson:"ammountMLC,omitempty" json:"ammountMLC,omitempty"`
 	VerdictLegal            string              `bson:"verdictLegal,omitempty" json:"verdictLegal,omitempty"`
 	ProcessPersonI          string              `bson:"processPersonI,omitempty" json:"processPersonI,omitempty"`
 	ProcessPersonF          string              `bson:"processPersonF,omitempty" json:"processPersonF,omitempty"`
@@ -235,6 +239,7 @@ type ContractSpecific struct {
 	State                   string                `bson:"state,omitempty" json:"state,omitempty"`
 	AmmountMN               float32               `bson:"ammountMN,omitempty" json:"ammountMN,omitempty"`
 	AmmountCUC              float32               `bson:"ammountCUC,omitempty" json:"ammountCUC,omitempty"`
+	AmmountMLC              float32               `bson:"ammountMLC,omitempty" json:"ammountMLC,omitempty"`
 	VerdictLegal            string                `bson:"verdictLegal,omitempty" json:"verdictLegal,omitempty"`
 	ProcessPersonI          string                `bson:"processPersonI,omitempty" json:"processPersonI,omitempty"`
 	ProcessPersonF          string                `bson:"processPersonF,omitempty" json:"processPersonF,omitempty"`

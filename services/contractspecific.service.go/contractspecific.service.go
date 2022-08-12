@@ -182,6 +182,7 @@ func UpdateByID(id string, cUpdate models.ContractSpecific) (int64, error) {
 		"state":                   cUpdate.State,
 		"ammountMN":               cUpdate.AmmountMN,
 		"ammountCUC":              cUpdate.AmmountCUC,
+		"ammountMLC":              cUpdate.AmmountMLC,
 		"verdictLegal":            cUpdate.VerdictLegal,
 		"processPersonI":          cUpdate.ProcessPersonI,
 		"processPersonF":          cUpdate.ProcessPersonF,

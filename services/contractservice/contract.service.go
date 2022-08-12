@@ -12,7 +12,7 @@ import (
 )
 
 // FindByCount => devuelve los Contratos filtrados  ---------- TotalContractQuery() --- concurrentes
-func FindByCountAndSort(codeCompany string, count int, order string, typ string, page int) ([]*models.Contract, int64, bool) {
+func FindByCountAndSort(codeCompany string, count int, order string, typ string, page int, state string) ([]*models.Contract, int64, bool) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -27,8 +27,13 @@ func FindByCountAndSort(codeCompany string, count int, order string, typ string,
 	if page > 1 {
 		pageNumber = (page - 1) * count
 	}
+	condition := bson.M{}
 
-	condition := bson.M{"codeCompany": codeCompany}
+	if state == "" {
+		condition = bson.M{"codeCompany": codeCompany}
+	} else if state == "Vigente" {
+		condition = bson.M{"codeCompany": codeCompany, "state": state}
+	}
 
 	var contracts []*models.Contract
 	cursor, err := db.ContractCollection.Find(ctx, condition, options.Find().SetLimit(int64(count)), options.Find().SetSkip(int64(pageNumber)).SetSort(bson.M{order: sort}))
@@ -40,7 +45,11 @@ func FindByCountAndSort(codeCompany string, count int, order string, typ string,
 		return contracts, 0, false
 	}
 
-	go TotalContractByCodeCompanyQuery(c, codeCompany)
+	if state == "Vigente" {
+		go TotalContractByCodeCompanyVigentQuery(c, codeCompany)
+	} else {
+		go TotalContractByCodeCompanyQuery(c, codeCompany)
+	}
 
 	defer cursor.Close(context.Background())
 	for cursor.Next(context.Background()) {
@@ -55,7 +64,7 @@ func FindByCountAndSort(codeCompany string, count int, order string, typ string,
 	return contracts, <-c, true
 }
 
-func FindByNameOrCode(codeCompany string, count int, order string, typ string, page int, word string) ([]*models.Contract, int64, bool) {
+func FindByNameOrCode(codeCompany string, count int, order string, typ string, page int, word, state string) ([]*models.Contract, int64, bool) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
@@ -68,16 +77,31 @@ func FindByNameOrCode(codeCompany string, count int, order string, typ string, p
 	if page > 1 {
 		pageNumber = (page - 1) * count
 	}
-	go TotalContractsQueryByWord(c, word, codeCompany)
-	var contracts []*models.Contract
-	cursor, err := db.ContractCollection.Find(ctx,
-		bson.M{
+	condition := bson.M{}
+
+	if state == "" {
+		condition = bson.M{
 			"codeCompany": codeCompany,
 			"$or": []bson.M{
 				bson.M{"clientProviderName": bson.M{"$regex": word, "$options": "im"}},
 				bson.M{"codeContract": bson.M{"$regex": word, "$options": "im"}},
 			},
-		},
+		}
+	} else if state == "Vigente" {
+		condition = bson.M{
+			"codeCompany": codeCompany,
+			"state":       state,
+			"$or": []bson.M{
+				bson.M{"clientProviderName": bson.M{"$regex": word, "$options": "im"}},
+				bson.M{"codeContract": bson.M{"$regex": word, "$options": "im"}},
+			},
+		}
+	}
+
+	go TotalContractsQueryByWord(c, word, codeCompany, state)
+	var contracts []*models.Contract
+	cursor, err := db.ContractCollection.Find(ctx,
+		condition,
 		options.Find().SetLimit(int64(count)),
 		options.Find().SetSkip(int64(pageNumber)).SetSort(bson.M{order: sort}))
 	if err != nil {
@@ -100,17 +124,31 @@ func FindByNameOrCode(codeCompany string, count int, order string, typ string, p
 	return contracts, <-c, true
 }
 
-func TotalContractsQueryByWord(c chan int64, word string, codeCompany string) {
+func TotalContractsQueryByWord(c chan int64, word string, codeCompany string, state string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	cursor, err := db.ContractCollection.CountDocuments(ctx, bson.M{
-		"codeCompany": codeCompany,
-		"$or": []bson.M{
-			bson.M{"clientProviderName": bson.M{"$regex": word, "$options": "im"}},
-			bson.M{"codeContract": bson.M{"$regex": word, "$options": "im"}},
-		},
-	})
+	condition := bson.M{}
+	if state == "" {
+		condition = bson.M{
+			"codeCompany": codeCompany,
+			"$or": []bson.M{
+				bson.M{"clientProviderName": bson.M{"$regex": word, "$options": "im"}},
+				bson.M{"codeContract": bson.M{"$regex": word, "$options": "im"}},
+			},
+		}
+	} else if state == "Vigente" {
+		condition = bson.M{
+			"codeCompany": codeCompany,
+			"state":       state,
+			"$or": []bson.M{
+				bson.M{"clientProviderName": bson.M{"$regex": word, "$options": "im"}},
+				bson.M{"codeContract": bson.M{"$regex": word, "$options": "im"}},
+			},
+		}
+	}
+
+	cursor, err := db.ContractCollection.CountDocuments(ctx, condition)
 	if err != nil {
 		c <- 0
 	} else {
@@ -123,6 +161,19 @@ func TotalContractByCodeCompanyQuery(c chan int64, code string) {
 	defer cancel()
 
 	condition := bson.M{"codeCompany": code}
+
+	cursor, err := db.ContractCollection.CountDocuments(ctx, condition)
+	if err != nil {
+		c <- 0
+	} else {
+		c <- cursor
+	}
+}
+func TotalContractByCodeCompanyVigentQuery(c chan int64, code string) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	condition := bson.M{"codeCompany": code, "state": "Vigente"}
 
 	cursor, err := db.ContractCollection.CountDocuments(ctx, condition)
 	if err != nil {
@@ -208,6 +259,7 @@ func UpdateByID(id string, cUpdate models.Contract) (int64, error) {
 		"state":                   cUpdate.State,
 		"ammountMN":               cUpdate.AmmountMN,
 		"ammountCUC":              cUpdate.AmmountCUC,
+		"ammountMLC":              cUpdate.AmmountMLC,
 		"verdictLegal":            cUpdate.VerdictLegal,
 		"processPersonI":          cUpdate.ProcessPersonI,
 		"processPersonF":          cUpdate.ProcessPersonF,
@@ -280,7 +332,7 @@ func GetNewCodeContract(codeCompany string, year string) ([]string, bool) {
 	return list, true
 }
 
-// FindByCodeCompanyAndDate   ---------- TotalContractQuery() --- concurrentes
+// FindByCodeCompanyAndDate
 func FindByCodeCompanyAndDate(codeCompany string) ([]*models.Contract, bool) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
@@ -302,6 +354,38 @@ func FindByCodeCompanyAndDate(codeCompany string) ([]*models.Contract, bool) {
 	defer cursor.Close(context.Background())
 	for cursor.Next(context.Background()) {
 		var contract models.Contract
+		err := cursor.Decode(&contract)
+		if err != nil {
+			return contracts, false
+		}
+		//contract.ClientProviderName, _ = clientproviderservice.FindNameByCustID(contract.CodeReeup)
+		contracts = append(contracts, &contract)
+	}
+	return contracts, true
+}
+
+// FindByCodeCompanyAndDate
+func FindByCodeCompanyAndDateEXCEL(codeCompany string) ([]*models.ContractEXCEL, bool) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	condition := bson.M{"codeCompany": codeCompany, "state": "Vigente", "expireAt": bson.M{"$lt": time.Now().Add(2880 * time.Hour)}}
+	var contracts []*models.ContractEXCEL
+
+	cursor, err := db.ContractCollection.Find(ctx, condition, options.Find().SetSort(bson.M{"clientProviderName": 1}))
+
+	if err != nil {
+		return contracts, false
+	}
+	err = cursor.Err()
+	if err != nil {
+		return contracts, false
+	}
+
+	defer cursor.Close(context.Background())
+	for cursor.Next(context.Background()) {
+		var contract models.ContractEXCEL
 		err := cursor.Decode(&contract)
 		if err != nil {
 			return contracts, false
@@ -383,4 +467,170 @@ func GetDaysByDefaultContract(codeCompany string) int {
 		days = rang.Range
 	}
 	return days
+}
+
+//
+// Stadistics
+//
+// FindByCodeCompanyAndDateStadistic   ---------- TotalContractQuery() --- concurrentes
+func FindByCodeCompanyAndDateStadistic(codeCompany string) ([]*models.Contract, bool) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	condition := bson.M{"codeCompany": codeCompany, "state": "Vigente", "expireAt": bson.M{"$lt": time.Now().Add(2880 * time.Hour)}}
+	var contracts []*models.Contract
+
+	cursor, err := db.ContractCollection.Find(ctx, condition, options.Find().SetSort(bson.M{"clientProviderName": 1}))
+
+	if err != nil {
+		return contracts, false
+	}
+	err = cursor.Err()
+	if err != nil {
+		return contracts, false
+	}
+
+	defer cursor.Close(context.Background())
+	for cursor.Next(context.Background()) {
+		var contract models.Contract
+		err := cursor.Decode(&contract)
+		if err != nil {
+			return contracts, false
+		}
+		//contract.ClientProviderName, _ = clientproviderservice.FindNameByCustID(contract.CodeReeup)
+		contracts = append(contracts, &contract)
+	}
+	return contracts, true
+}
+
+func FindByCountAndSortStadistic(codeCompany string, count int, order string, typ string, page int, filter string) ([]*models.Contract, int64, bool) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	c := make(chan int64)
+
+	var sort int = 1
+	if typ == "desc" {
+		sort = -1
+	}
+	pageNumber := 0
+	if page > 1 {
+		pageNumber = (page - 1) * count
+	}
+	condition := bson.M{}
+	if filter == "Vencidos" {
+		condition = bson.M{"codeCompany": codeCompany, "state": "Vigente", "expireAt": bson.M{"$lt": time.Now().Add(-24 * time.Hour)}}
+	} else {
+		condition = bson.M{"codeCompany": codeCompany, "state": filter}
+	}
+
+	var contracts []*models.Contract
+	cursor, err := db.ContractCollection.Find(ctx, condition, options.Find().SetLimit(int64(count)), options.Find().SetSkip(int64(pageNumber)).SetSort(bson.M{order: sort}))
+	if err != nil {
+		return contracts, 0, false
+	}
+	err = cursor.Err()
+	if err != nil {
+		return contracts, 0, false
+	}
+
+	go TotalContractByCodeCompanyQueryStadistic(c, condition)
+
+	defer cursor.Close(context.Background())
+	for cursor.Next(context.Background()) {
+		var contract models.Contract
+		err := cursor.Decode(&contract)
+		if err != nil {
+			return contracts, 0, false
+		}
+		//contract.ClientProviderName, _ = clientproviderservice.FindNameByCustID(contract.CodeReeup)
+		contracts = append(contracts, &contract)
+	}
+	return contracts, <-c, true
+}
+
+func TotalContractByCodeCompanyQueryStadistic(c chan int64, condition primitive.M) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	cursor, err := db.ContractCollection.CountDocuments(ctx, condition)
+	if err != nil {
+		c <- 0
+	} else {
+		c <- cursor
+	}
+}
+
+func FindByCountAndSortStadisticAll(codeCompany string, filter string) ([]*models.Contract, bool) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	condition := bson.M{}
+	if filter == "Vencidos" {
+		condition = bson.M{"codeCompany": codeCompany, "state": "Vigente", "expireAt": bson.M{"$lt": time.Now().Add(-24 * time.Hour)}}
+	} else {
+		condition = bson.M{"codeCompany": codeCompany, "state": "Vigente"}
+	}
+
+	var contracts []*models.Contract
+	cursor, err := db.ContractCollection.Find(ctx, condition, options.Find().SetSort(bson.M{"expireAt": 1}))
+	if err != nil {
+		return contracts, false
+	}
+	err = cursor.Err()
+	if err != nil {
+		return contracts, false
+	}
+
+	defer cursor.Close(context.Background())
+	for cursor.Next(context.Background()) {
+		var contract models.Contract
+		err := cursor.Decode(&contract)
+		if err != nil {
+			return contracts, false
+		}
+		//contract.ClientProviderName, _ = clientproviderservice.FindNameByCustID(contract.CodeReeup)
+		contracts = append(contracts, &contract)
+	}
+	return contracts, true
+}
+
+func FindByCountAndSortStadisticAllEXCEL(codeCompany string, filter string) ([]*models.ContractEXCEL, bool) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	condition := bson.M{}
+	if filter == "Terminado" {
+		condition = bson.M{"codeCompany": codeCompany, "state": "Terminado"}
+	} else if filter == "Vencidos" {
+		condition = bson.M{"codeCompany": codeCompany, "state": "Vigente", "expireAt": bson.M{"$lt": time.Now().Add(-24 * time.Hour)}}
+	} else {
+		condition = bson.M{"codeCompany": codeCompany, "state": "Vigente"}
+	}
+
+	var contracts []*models.ContractEXCEL
+	cursor, err := db.ContractCollection.Find(ctx, condition, options.Find().SetSort(bson.M{"expireAt": 1}))
+	if err != nil {
+		return contracts, false
+	}
+	err = cursor.Err()
+	if err != nil {
+		return contracts, false
+	}
+
+	defer cursor.Close(context.Background())
+	for cursor.Next(context.Background()) {
+		var contract models.ContractEXCEL
+		err := cursor.Decode(&contract)
+		if err != nil {
+			return contracts, false
+		}
+		//contract.ClientProviderName, _ = clientproviderservice.FindNameByCustID(contract.CodeReeup)
+		contracts = append(contracts, &contract)
+	}
+	return contracts, true
 }

@@ -117,6 +117,7 @@ func UpdateByID(id string, cUpdate models.SupplementSpecific) (int64, error) {
 		"description":    cUpdate.Description,
 		"ammountMN":      cUpdate.AmmountMN,
 		"ammountCUC":     cUpdate.AmmountCUC,
+		"ammountMLC":     cUpdate.AmmountMLC,
 		"operationMN":    cUpdate.OperationMN,
 		"operationCUC":   cUpdate.OperationCUC,
 		"codeCompany":    cUpdate.CodeCompany,

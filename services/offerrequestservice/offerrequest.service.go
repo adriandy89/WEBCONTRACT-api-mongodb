@@ -140,6 +140,7 @@ func UpdateByID(id string, cUpdate models.OfferRequest) (int64, error) {
 		"codeOffer":          cUpdate.CodeOffer,
 		"ammountMN":          cUpdate.AmmountMN,
 		"ammountCUC":         cUpdate.AmmountCUC,
+		"ammountMLC":         cUpdate.AmmountMLC,
 		"state":              cUpdate.State,
 		"description":        cUpdate.Description,
 		"codeCompany":        cUpdate.CodeCompany,

@@ -3,6 +3,7 @@ package stadisticservice
 import (
 	"WEBCONTRACT-api-mongodb/db"
 	"WEBCONTRACT-api-mongodb/models"
+	"WEBCONTRACT-api-mongodb/services/supplementservice"
 	"context"
 	"time"
 
@@ -10,55 +11,88 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func TotalContractByCodeCompanyQueryClasif(code string) (int64, int64) {
+func TotalContractByCodeCompanyQueryClasif(code string) (int64, int64, int64, int64) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	condition := bson.M{"codeCompany": code, "state": "Vigente"}
-	condition2 := bson.M{"codeCompany": code, "state": "Terminado"}
+	condition := bson.M{"codeCompany": code, "state": "Vigente", "clientSupplier": "Cliente"}
+	condition2 := bson.M{"codeCompany": code, "state": "Terminado", "clientSupplier": "Cliente"}
 
-	active, err := db.ContractCollection.CountDocuments(ctx, condition)
+	condition3 := bson.M{"codeCompany": code, "state": "Vigente", "clientSupplier": "Proveedor"}
+	condition4 := bson.M{"codeCompany": code, "state": "Terminado", "clientSupplier": "Proveedor"}
+
+	activeClient, err := db.ContractCollection.CountDocuments(ctx, condition)
 	if err != nil {
-		return 0, 0
+		return 0, 0, 0, 0
 	}
-	inactive, err2 := db.ContractCollection.CountDocuments(ctx, condition2)
+	inactiveClient, err2 := db.ContractCollection.CountDocuments(ctx, condition2)
 	if err2 != nil {
-		return 0, 0
+		return 0, 0, 0, 0
 	}
 
-	return active, inactive
+	activeProvider, err3 := db.ContractCollection.CountDocuments(ctx, condition3)
+	if err3 != nil {
+		return 0, 0, 0, 0
+	}
+	inactiveProvider, err4 := db.ContractCollection.CountDocuments(ctx, condition4)
+	if err4 != nil {
+		return 0, 0, 0, 0
+	}
+
+	return activeClient, inactiveClient, activeProvider, inactiveProvider
 
 }
 
-func FindActivesByCodeCompanyAndDate(codeCompany string) ([]*models.Contract, bool) {
+func FindActivesByCodeCompanyAndDate(codeCompany string) ([]*models.Contract, []*models.Contract, bool) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
+	//clientes
+	conditionClient := bson.M{"codeCompany": codeCompany, "state": "Vigente", "clientSupplier": "Cliente", "expireAt": bson.M{"$lt": time.Now().Add(-24 * time.Hour)}}
+	var contractsClient []*models.Contract
+	//proveedores
+	conditionProv := bson.M{"codeCompany": codeCompany, "state": "Vigente", "clientSupplier": "Proveedor", "expireAt": bson.M{"$lt": time.Now().Add(-24 * time.Hour)}}
+	var contractsProv []*models.Contract
 
-	condition := bson.M{"codeCompany": codeCompany, "state": "Vigente", "expireAt": bson.M{"$lt": time.Now().Add(-24 * time.Hour)}}
-	var contracts []*models.Contract
-
-	cursor, err := db.ContractCollection.Find(ctx, condition)
+	cursor, err := db.ContractCollection.Find(ctx, conditionClient)
+	cursorProv, errProv := db.ContractCollection.Find(ctx, conditionProv)
 
 	if err != nil {
-		return contracts, false
+		return nil, nil, false
 	}
 	err = cursor.Err()
 	if err != nil {
-		return contracts, false
+		return nil, nil, false
+	}
+	if errProv != nil {
+		return nil, nil, false
+	}
+	errProv = cursorProv.Err()
+	if errProv != nil {
+		return nil, nil, false
 	}
 
 	defer cursor.Close(context.Background())
 	for cursor.Next(context.Background()) {
-		var contract models.Contract
-		err := cursor.Decode(&contract)
+		var contractClient models.Contract
+		err := cursor.Decode(&contractClient)
 		if err != nil {
-			return contracts, false
+			return nil, nil, false
 		}
 		//contract.ClientProviderName, _ = clientproviderservice.FindNameByCustID(contract.CodeReeup)
-		contracts = append(contracts, &contract)
+		contractsClient = append(contractsClient, &contractClient)
 	}
-	return contracts, true
+
+	defer cursorProv.Close(context.Background())
+	for cursorProv.Next(context.Background()) {
+		var contractProv models.Contract
+		errProv := cursorProv.Decode(&contractProv)
+		if errProv != nil {
+			return nil, nil, false
+		}
+		contractsProv = append(contractsProv, &contractProv)
+	}
+	return contractsClient, contractsProv, true
 }
 
 func TotalTypeCoisByCodeCompany(code string) (int64, int64, int64) {
@@ -70,10 +104,12 @@ func TotalTypeCoisByCodeCompany(code string) (int64, int64, int64) {
 		"$or": []bson.M{
 			bson.M{"codeTypeCoin": "CUC"},
 			bson.M{"codeTypeCoin": "MN"},
+			bson.M{"codeTypeCoin": "AMBAS"},
 		},
 	}
 	condition2 := bson.M{"codeCompany": code, "codeTypeCoin": "MLC"}
-	condition3 := bson.M{"codeCompany": code, "codeTypeCoin": "AMBAS"}
+	// Los contratos solo se pueden hacer en una moneda, por eso se kita est condicion
+	//condition3 := bson.M{"codeCompany": code, "codeTypeCoin": "AMBAS"}
 
 	cup, err := db.ContractCollection.CountDocuments(ctx, condition)
 	if err != nil {
@@ -83,12 +119,12 @@ func TotalTypeCoisByCodeCompany(code string) (int64, int64, int64) {
 	if err2 != nil {
 		return 0, 0, 0
 	}
-	ambas, err3 := db.ContractCollection.CountDocuments(ctx, condition3)
+	/*ambas, err3 := db.ContractCollection.CountDocuments(ctx, condition3)
 	if err3 != nil {
 		return 0, 0, 0
-	}
+	}*/
 
-	return cup, mlc, ambas
+	return cup, mlc, 0
 }
 
 func FindActivesByCodeCompanyGroupBy(codeCompany string) ([]*models.Contract, bool) {
@@ -134,10 +170,12 @@ func TotalTypeCoisByCodeCompanyXDate(code string, start *time.Time, end *time.Ti
 		"$or": []bson.M{
 			bson.M{"codeTypeCoin": "CUC"},
 			bson.M{"codeTypeCoin": "MN"},
+			bson.M{"codeTypeCoin": "AMBAS"},
 		},
 	}
 	condition2 := bson.M{"codeCompany": code, "codeTypeCoin": "MLC", "createdAt": bson.M{"$gte": start, "$lt": end}}
-	condition3 := bson.M{"codeCompany": code, "codeTypeCoin": "AMBAS", "createdAt": bson.M{"$gte": start, "$lt": end}}
+
+	//condition3 := bson.M{"codeCompany": code, "codeTypeCoin": "AMBAS", "createdAt": bson.M{"$gte": start, "$lt": end}}
 
 	cup, err := db.ContractCollection.CountDocuments(ctx, condition)
 	if err != nil {
@@ -147,10 +185,42 @@ func TotalTypeCoisByCodeCompanyXDate(code string, start *time.Time, end *time.Ti
 	if err2 != nil {
 		return 0, 0, 0
 	}
-	ambas, err3 := db.ContractCollection.CountDocuments(ctx, condition3)
+	/* ambas, err3 := db.ContractCollection.CountDocuments(ctx, condition3)
 	if err3 != nil {
 		return 0, 0, 0
+	} */
+
+	return cup, mlc, 0
+}
+
+func ContractsWithSupplTotalCoins(codeCompany string, typeContract string) ([]*models.Contract, bool) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	condition := bson.M{"codeCompany": codeCompany, "clientSupplier": typeContract}
+	var contracts []*models.Contract
+
+	cursor, err := db.ContractCollection.Find(ctx, condition, options.Find().SetProjection(bson.M{"codeContract": 1, "codeReeup": 1, "codeCompany": 1, "ammountMN": 1, "ammountCUC": 1, "ammountMLC": 1, "createdAt": 1}))
+
+	if err != nil {
+		return contracts, false
+	}
+	err = cursor.Err()
+	if err != nil {
+		return contracts, false
 	}
 
-	return cup, mlc, ambas
+	defer cursor.Close(context.Background())
+	for cursor.Next(context.Background()) {
+		var contract models.Contract
+		err := cursor.Decode(&contract)
+		if err != nil {
+			return contracts, false
+		}
+		contract.Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeup(contract.CodeCompany, contract.CodeContract, contract.CodeReeup)
+
+		contracts = append(contracts, &contract)
+	}
+	return contracts, true
 }

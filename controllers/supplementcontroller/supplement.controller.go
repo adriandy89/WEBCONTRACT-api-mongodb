@@ -6,6 +6,7 @@ import (
 	"WEBCONTRACT-api-mongodb/services/messageservice"
 	"WEBCONTRACT-api-mongodb/services/supplementservice"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -20,6 +21,8 @@ func SupplementRegister(w http.ResponseWriter, r *http.Request) {
 		var supplement models.Supplement
 		err := json.NewDecoder(r.Body).Decode(&supplement)
 		if err != nil {
+			fmt.Println(r.Body)
+			fmt.Println(err)
 			errorservice.ErrorMessage(w, "Error en la validacion de datos", 400)
 			return
 		}

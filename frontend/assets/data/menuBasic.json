@@ -7,7 +7,23 @@
   {
     "text": "Informes",
     "icon": "information",
-    "routerLink": "/dashboard/reports"
+    "children": [
+      {
+        "text": "Resumen Entidad",
+        "icon": "list",
+        "routerLink": "/dashboard/reports"
+      },
+      {
+        "text": "Contratos Clasificados",
+        "icon": "list",
+        "routerLink": "/dashboard/reports/details"
+      },
+      {
+        "text": "Resumen Entidades",
+        "icon": "list",
+        "routerLink": "/dashboard/reports/entities"
+      }
+    ]
   },
   {
     "text": "Ofertas",
@@ -19,7 +35,12 @@
     "icon": "contracts",
     "children": [
       {
-        "text": "Listar",
+        "text": "Listar Vigentes",
+        "icon": "list",
+        "routerLink": "/dashboard/contracts_vigent"
+      },
+      {
+        "text": "Listar Todos",
         "icon": "list",
         "routerLink": "/dashboard/contracts"
       },
