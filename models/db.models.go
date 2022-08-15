@@ -219,7 +219,25 @@ type Contract struct {
 	Supplements             []*Supplement       `bson:"supplements,omitempty" json:"supplements,omitempty"`
 	Specifics               []*ContractSpecific `bson:"specifics,omitempty" json:"specifics,omitempty"`
 	Offer                   *OfferRequest       `bson:"offer,omitempty" json:"offer,omitempty"`
+	Cronogram               []Cronogram     	`bson:"cronogram,omitempty" json:"cronogram,omitempty"`
+	Aproved               	[]Aproved     		`bson:"aproved,omitempty" json:"aproved,omitempty"`
 }
+
+type Cronogram struct {
+	Code        			string `bson:"code,omitempty" json:"code,omitempty"`
+	BeginEstimated        	*time.Time `bson:"beginEstimated,omitempty" json:"beginEstimated,omitempty"`
+	EndEstimated        	*time.Time `bson:"endEstimated,omitempty" json:"endEstimated,omitempty"`
+	BeginOficial        	*time.Time `bson:"beginOficial,omitempty" json:"beginOficial,omitempty"`
+	EndOficial        		*time.Time `bson:"endOficial,omitempty" json:"endOficial,omitempty"`
+	Description 			string `bson:"description,omitempty" json:"description,omitempty"`
+}
+
+type Aproved struct {
+	Code        			string `bson:"code,omitempty" json:"code,omitempty"`
+	AprovedDate        		*time.Time `bson:"aprovedDate,omitempty" json:"aprovedDate,omitempty"`
+	Description 			string `bson:"description,omitempty" json:"description,omitempty"`
+}
+
 type NonCompliance struct {
 	Name        string `bson:"name,omitempty" json:"name,omitempty"`
 	Description string `bson:"description,omitempty" json:"description,omitempty"`

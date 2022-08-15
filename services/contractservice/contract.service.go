@@ -280,6 +280,8 @@ func UpdateByID(id string, cUpdate models.Contract) (int64, error) {
 		"fileRoute":               cUpdate.FileRoute,
 		"supplements":             cUpdate.Supplements,
 		"nonCompliance":           cUpdate.NonCompliance,
+		"cronogram":           	   cUpdate.Cronogram,
+		"aproved":           	   cUpdate.Aproved,
 	}}
 
 	upd, err := db.ContractCollection.UpdateOne(ctx, condition, update)
