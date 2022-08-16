@@ -229,3 +229,16 @@ func FindCompanyName(codeCompany string) string {
 	}
 	return result.CompanyName
 }
+
+func FindCompanyCodeFather(codeCompany string) string {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	var result models.Entity
+
+	err := db.EntityCollection.FindOne(ctx, bson.M{"codeCompany": codeCompany}, options.FindOne().SetProjection(bson.M{"codeFather": 1})).Decode(&result)
+	if err != nil {
+		return ""
+	}
+	return result.CodeFather
+}

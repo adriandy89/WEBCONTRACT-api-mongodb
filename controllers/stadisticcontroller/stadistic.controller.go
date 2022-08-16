@@ -172,7 +172,9 @@ func GetStadisticsEntities(w http.ResponseWriter, r *http.Request) {
 	respt := make([]models.StadisticsDetailEntitiesReponse, 0)
 	for l := 0; l < len(companies); l++ {
 		cListResp := getStadisticsContractsActiveInactiveOutdateTotal(companies[l])
-		cListResp.Entidad = entityservice.FindCompanyName(companies[l])
+		cListResp.CodeCompany = companies[l]
+		cListResp.Entidad = entityservice.FindCompanyName(companies[l])		
+		cListResp.CodeFather = entityservice.FindCompanyCodeFather(companies[l])
 		respt = append(respt, cListResp)
 	}
 	//var cListResp models.EntitiesResponse = models.EntitiesResponse{EntitiestList: arrg}

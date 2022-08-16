@@ -79,6 +79,8 @@ type StadisticsDetailReponse struct {
 }
 type StadisticsDetailEntitiesReponse struct {
 	Entidad            string  `json:"Entidad"`
+	CodeCompany        string  `json:"CodeCompany"`
+	CodeFather         string  `json:"CodeFather"`
 	OutTermClient      int     `json:"Vencidos_Cientes"`
 	ActiveClient       int64   `json:"Vigentes_Clientes"`
 	EndedClient        int64   `json:"Terminados_Clientes"`
