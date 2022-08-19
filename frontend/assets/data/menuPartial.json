@@ -9,7 +9,7 @@
     "icon": "information",
     "children": [
       {
-        "text": "Resumen Entidad",
+        "text": "Resumen General",
         "icon": "list",
         "routerLink": "/dashboard/reports"
       },
@@ -22,13 +22,13 @@
         "text": "Resumen Entidades",
         "icon": "list",
         "routerLink": "/dashboard/reports/entities"
+      },
+      {
+        "text": "Resumen General",
+        "icon": "list",
+        "routerLink": "/dashboard/reports-tree"
       }
     ]
-  },
-  {
-    "text": "Ofertas",
-    "icon": "offer",
-    "routerLink": "/dashboard/offers"
   },
   {
     "text": "Contratos",

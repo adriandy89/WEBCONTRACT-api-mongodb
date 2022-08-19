@@ -6,6 +6,8 @@ For my current Go environment, I wil get “.exe” as a compiled package
 go build
 To build to different target across platform, You will need to change “GOOS” and “GOARCH” using this command
 $env:GOOS = "linux"
+or
+set GOOS=linux
 Then, check again
 go env
 

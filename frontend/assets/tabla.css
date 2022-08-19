@@ -1,4 +1,8 @@
-.td, .th {
+*{
+  font-size: 0.9rem;
+}
+
+.td, th {
   border: 1px solid grey;
   text-align: left;
   padding: 5px;
@@ -6,4 +10,12 @@
 
 .tr:nth-child(even) {
   background-color: lightgrey;
+}
+
+button{
+  display: none;
+}
+
+.mat-icon{
+  display: none;
 }
