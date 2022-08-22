@@ -9,14 +9,9 @@
     "icon": "information",
     "children": [
       {
-        "text": "Resumen General",
+        "text": "Estadísticas Entidad",
         "icon": "list",
         "routerLink": "/dashboard/reports"
-      },
-      {
-        "text": "Contratos Clasificados",
-        "icon": "list",
-        "routerLink": "/dashboard/reports/details"
       },
       {
         "text": "Resumen Entidades",
@@ -43,6 +38,11 @@
         "text": "Listar Todos",
         "icon": "list",
         "routerLink": "/dashboard/contracts"
+      },
+      {
+        "text": "Contratos Clasificados",
+        "icon": "list",
+        "routerLink": "/dashboard/reports/details"
       },
       {
         "text": "Alertas",
