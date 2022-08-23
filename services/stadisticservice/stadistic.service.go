@@ -193,6 +193,39 @@ func TotalTypeCoisByCodeCompanyXDate(code string, start *time.Time, end *time.Ti
 	return cup, mlc, 0
 }
 
+func TotalContractsByMonths(code string, start *time.Time, end *time.Time) int64 {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	condition := bson.M{
+		"codeCompany": code,
+		"createdAt":   bson.M{"$gte": start, "$lt": end},
+	}
+
+	cant, err := db.ContractCollection.CountDocuments(ctx, condition)
+	if err != nil {
+		return 0
+	}
+
+	return cant
+}
+
+func TotalSuplementsByMonths(code string, start *time.Time, end *time.Time) int64 {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	condition := bson.M{
+		"codeCompany": code,
+		"createdAt":   bson.M{"$gte": start, "$lt": end},
+	}
+
+	cant, err := db.SuplementCollection.CountDocuments(ctx, condition)
+	if err != nil {
+		return 0
+	}
+	return cant
+}
+
 func ContractsWithSupplTotalCoins(codeCompany string, typeContract string) ([]*models.Contract, bool) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)

@@ -118,6 +118,44 @@ func TotalTypeCoisByCodeCompanyXDate(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(cListResp)
 
 }
+func TotalContractsByMonths(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	var codeCompany string = vars["codeCompany"]
+
+	currentTime := time.Now()
+
+	var dateArrA []time.Time
+	var dateArrB []time.Time
+
+	for i := 1; i <= 12; i++ {
+		dateArrA = append(dateArrA, time.Date(currentTime.Year(), time.Month(i), 1, 0, 0, 0, 0, time.UTC))
+		dateArrB = append(dateArrB, time.Date(currentTime.Year()-1, time.Month(i), 1, 0, 0, 0, 0, time.UTC))
+		if i == 12 {
+			dateArrA = append(dateArrA, time.Date(currentTime.Year()+1, time.Month(1), 1, 0, 0, 0, 0, time.UTC))
+			dateArrB = append(dateArrB, time.Date(currentTime.Year(), time.Month(1), 1, 0, 0, 0, 0, time.UTC))
+		}
+	}
+
+	var yearA []int64
+	var yearB []int64
+	var yearAs []int64
+	var yearBs []int64
+
+	for i := 0; i < len(dateArrA)-1; i++ {
+		yearA = append(yearA, stadisticservice.TotalContractsByMonths(codeCompany, &dateArrA[i], &dateArrA[i+1]))
+		yearB = append(yearB, stadisticservice.TotalContractsByMonths(codeCompany, &dateArrB[i], &dateArrB[i+1]))
+		yearAs = append(yearAs, stadisticservice.TotalSuplementsByMonths(codeCompany, &dateArrA[i], &dateArrA[i+1]))
+		yearBs = append(yearBs, stadisticservice.TotalSuplementsByMonths(codeCompany, &dateArrB[i], &dateArrB[i+1]))
+	}
+
+	cListResp := models.StadisticsTotalsByMonthsReponse{YearActual: yearA, YearBefore: yearB, YearA: currentTime.Year(), YearB: currentTime.Year() - 1,
+		YearActualS: yearAs, YearBeforeS: yearBs}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(cListResp)
+
+}
 
 func GetContractsClientProviderName(w http.ResponseWriter, r *http.Request) {
 
@@ -173,7 +211,7 @@ func GetStadisticsEntities(w http.ResponseWriter, r *http.Request) {
 	for l := 0; l < len(companies); l++ {
 		cListResp := getStadisticsContractsActiveInactiveOutdateTotal(companies[l])
 		cListResp.CodeCompany = companies[l]
-		cListResp.Entidad = entityservice.FindCompanyName(companies[l])		
+		cListResp.Entidad = entityservice.FindCompanyName(companies[l])
 		cListResp.CodeFather = entityservice.FindCompanyCodeFather(companies[l])
 		respt = append(respt, cListResp)
 	}

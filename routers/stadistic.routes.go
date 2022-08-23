@@ -11,6 +11,7 @@ import (
 func StadisticRoutes(r *mux.Router) {
 	r.HandleFunc("/api/stadistics/{codeCompany}", middlewares.CheckDB(middlewares.ValidateJWT(stadisticcontroller.GetStadisticsContractsActiveInactiveOutdateTotal))).Methods("GET")
 	r.HandleFunc("/api/servertime", middlewares.CheckDB(middlewares.ValidateJWT(stadisticcontroller.GetServerTime))).Methods("GET")
+	r.HandleFunc("/api/stadisticsmonths/{codeCompany}", middlewares.CheckDB(middlewares.ValidateJWT(stadisticcontroller.TotalContractsByMonths))).Methods("GET")
 	r.HandleFunc("/api/stadisticsCoins/{codeCompany}", middlewares.CheckDB(middlewares.ValidateJWT(stadisticcontroller.TotalTypeCoisByCodeCompany))).Methods("GET")
 	r.HandleFunc("/api/stadisticsCoins/{codeCompany}", middlewares.CheckDB(middlewares.ValidateJWT(stadisticcontroller.TotalTypeCoisByCodeCompanyXDate))).Methods("POST")
 	r.HandleFunc("/api/stadisticsClientsActives/{codeCompany}", middlewares.CheckDB(middlewares.ValidateJWT(stadisticcontroller.GetContractsClientProviderName))).Methods("GET")

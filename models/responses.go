@@ -114,6 +114,15 @@ type StadisticsDetailTypeCoisReponse struct {
 	Total int64 `json:"total"`
 }
 
+type StadisticsTotalsByMonthsReponse struct {
+	YearActual  []int64 `json:"yearActual"`
+	YearActualS []int64 `json:"yearActualS"`
+	YearA       int     `json:"yearA"`
+	YearBefore  []int64 `json:"yearBefore"`
+	YearBeforeS []int64 `json:"yearBeforeS"`
+	YearB       int     `json:"yearB"`
+}
+
 type Tree struct {
 	CodeCompany string `json:"codeCompany"`
 	CodeFather  string `json:"codeFather"`
