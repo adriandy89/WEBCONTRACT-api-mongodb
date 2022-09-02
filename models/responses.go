@@ -6,8 +6,9 @@ import (
 
 // LoginReponse => Cuerpo de respuesta la momento de hacer login
 type LoginReponse struct {
-	Token string `json:"token"`
-	User  User   `json:"user"`
+	Token       string `json:"token"`
+	User        User   `json:"user"`
+	CompanyName string `json:"companyName"`
 }
 
 // CategoryReponse => Cuerpo de respuesta la momento de devolver categorias
@@ -24,10 +25,19 @@ type ClientProviderReponse struct {
 
 // ContractReponse => Cuerpo de respuesta la momento de devolver contratos
 type ContractReponse struct {
-	Total        int64       `json:"total"`
-	ContractList []*Contract `json:"contractList"`
-	Ending       int         `json:"ending"`
-	Ended        int         `json:"ended"`
+	Total         int64       `json:"total"`
+	ContractList  []*Contract `json:"contractList"`
+	ContractListC []*Contract `json:"contractListC"`
+	ContractListP []*Contract `json:"contractListP"`
+	Ending        int         `json:"ending"`
+	Ended         int         `json:"ended"`
+}
+
+type ContractAlertsReponse struct {
+	ContractListEnding []*Contract `json:"contractListEnding"`
+	ContractListEnded  []*Contract `json:"contractListEnded"`
+	Ending             int         `json:"ending"`
+	Ended              int         `json:"ended"`
 }
 
 // OfferRequestReponse => Cuerpo de respuesta la momento de devolver ofertas
@@ -137,6 +147,7 @@ type ContractEXCEL struct {
 	CodeContract       string             `bson:"codeContract,omitempty" json:"Codigo_Contract,omitempty"`
 	CodeReeup          string             `bson:"codeReeup,omitempty" json:"Reeup,omitempty"`
 	CodeCompany        string             `bson:"codeCompany,omitempty" json:"Entidad,omitempty"`
+	CompanyName        string             `bson:"companyName,omitempty" json:"Entidad_Nombre,omitempty"`
 	State              string             `bson:"state,omitempty" json:"Estado,omitempty"`
 	CodeTypeCoin       string             `bson:"codeTypeCoin,omitempty" json:"Monedas,omitempty"`
 	ClientSupplier     string             `bson:"clientSupplier,omitempty" json:"Tipo,omitempty"`

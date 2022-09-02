@@ -9,6 +9,7 @@ import (
 
 	"WEBCONTRACT-api-mongodb/models"
 	authservice "WEBCONTRACT-api-mongodb/services/authservices"
+	"WEBCONTRACT-api-mongodb/services/entityservice"
 	"WEBCONTRACT-api-mongodb/services/errorservice"
 )
 
@@ -38,9 +39,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	companyName := entityservice.FindCompanyName(userLogged.CodeCompany)
+
 	resp := models.LoginReponse{
-		Token: jwtKey,
-		User:  userLogged,
+		Token:       jwtKey,
+		User:        userLogged,
+		CompanyName: companyName,
 	}
 
 	w.Header().Set("content-type", "application/json")

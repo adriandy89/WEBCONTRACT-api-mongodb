@@ -162,14 +162,14 @@ func GetContractsClientProviderName(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	var codeCompany string = vars["codeCompany"]
 
-	cList, founded := stadisticservice.FindActivesByCodeCompanyGroupBy(codeCompany)
+	cListC, cListP, founded := stadisticservice.FindActivesByCodeCompanyGroupBy(codeCompany)
 
 	if !founded {
 		errorservice.ErrorMessage(w, "Parametros Invalidos", 400)
 		return
 	}
 
-	var cListResp models.ContractReponse = models.ContractReponse{ContractList: cList}
+	var cListResp models.ContractReponse = models.ContractReponse{ContractListC: cListC, ContractListP: cListP}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(cListResp)

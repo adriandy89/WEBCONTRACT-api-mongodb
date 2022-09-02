@@ -395,6 +395,8 @@ func GetContractsEnding(w http.ResponseWriter, r *http.Request) {
 	today := time.Now().Add(-24 * time.Hour)
 	ending := 0
 	ended := 0
+	var cListEnding []*models.Contract
+	var cListEnded []*models.Contract
 	for i := 0; i < len(cList); i++ {
 
 		cList[i].Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeup(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
@@ -430,24 +432,28 @@ func GetContractsEnding(w http.ResponseWriter, r *http.Request) {
 				}
 				if bigger.Before(today) {
 					ended++
+					cListEnded = append(cListEnded, cList[i])
 				} else {
 					ending++
+					cListEnding = append(cListEnding, cList[i])
 				}
 			} else {
 				if cList[i].ExpireAt.Before(today) {
 					ended++
+					cListEnded = append(cListEnded, cList[i])
 				} else {
 					ending++
+					cListEnding = append(cListEnding, cList[i])
 				}
 			}
 		}
 
 	}
-	var cListResp models.ContractReponse
+	var cListResp models.ContractAlertsReponse
 	if total == "full" {
-		cListResp = models.ContractReponse{ContractList: cList, Ending: ending, Ended: ended}
+		cListResp = models.ContractAlertsReponse{ContractListEnding: cListEnding, ContractListEnded: cListEnded, Ending: ending, Ended: ended}
 	} else {
-		cListResp = models.ContractReponse{Ending: ending, Ended: ended}
+		cListResp = models.ContractAlertsReponse{Ending: ending, Ended: ended}
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -485,8 +491,31 @@ func GetContractsEndingEXCEL(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-	var cListResp models.ContractEXCELResponse
-	cListResp = models.ContractEXCELResponse{ContractList: cList}
+	today := time.Now().Add(-24 * time.Hour)
+	for i := 0; i < len(cList); i++ {
+		cList[i].CompanyName = entityservice.FindCompanyName(cList[i].CodeCompany)
+		if cList[i].Supplements != nil && len(cList[i].Supplements) > 0 {
+			bigger := cList[i].ExpireAt
+			for j := 0; j < len(cList[i].Supplements); j++ {
+				if cList[i].Supplements[j].ExpireAt != nil {
+					if cList[i].Supplements[j].State == "Activo" {
+						if bigger.Before(*cList[i].Supplements[j].ExpireAt) {
+							bigger = cList[i].Supplements[j].ExpireAt
+						}
+					}
+				}
+			}
+			if bigger.Before(today) {
+				cList[i].State = "Vencido"
+			}
+		} else {
+			if cList[i].ExpireAt.Before(today) {
+				cList[i].State = "Vencido"
+			}
+		}
+	}
+
+	cListResp := models.ContractEXCELResponse{ContractList: cList}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -804,6 +833,10 @@ func GetContractsStadisticAll(w http.ResponseWriter, r *http.Request) {
 		cListResp = models.ContractReponse{Total: int64(len(cList)), ContractList: cList}
 	}
 
+	for i := 0; i < len(cListResp.ContractList); i++ {
+		cListResp.ContractList[i].CompanyName = entityservice.FindCompanyName(cListResp.ContractList[i].CodeCompany)
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(cListResp)
@@ -892,6 +925,7 @@ func GetContractsStadisticAllEXCEL(w http.ResponseWriter, r *http.Request) {
 		for i := 0; i < len(cList); i++ {
 
 			cList[i].Supplements, _ = supplementservice.FindAllByCodeCompanyContractReeupEXCEL(cList[i].CodeCompany, cList[i].CodeContract, cList[i].CodeReeup)
+			cList[i].State = "Vencido"
 			truncated := false
 			for j := 0; j < len(cList[i].Supplements); j++ {
 				if cList[i].Supplements[j].ExpireAt != nil {
@@ -976,9 +1010,10 @@ func GetContractsStadisticAllEXCEL(w http.ResponseWriter, r *http.Request) {
 		} else {
 			cListResp = models.ContractEXCELResponse{ContractList: cList}
 		}
-
 	}
-
+	for i := 0; i < len(cListResp.ContractList); i++ {
+		cListResp.ContractList[i].CompanyName = entityservice.FindCompanyName(cListResp.ContractList[i].CodeCompany)
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(cListResp)

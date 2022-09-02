@@ -1,0 +1,4 @@
+Repositorios para linux mac y wibdows de solo docker
+http://repos.uclv.edu.cu/docker-ce/
+
+El acceso a docker hub se encuentra bloqueado a Cuba debido al bloqueo de EUA contra nuestro país. Le recomendamos usar el mirror en https://docker.uclv.cu para descargar las imágenes de los contenedores. Esto debe hacerlo desde docker. No funciona desde un navegador.

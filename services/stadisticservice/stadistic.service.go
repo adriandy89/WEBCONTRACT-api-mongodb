@@ -127,22 +127,27 @@ func TotalTypeCoisByCodeCompany(code string) (int64, int64, int64) {
 	return cup, mlc, 0
 }
 
-func FindActivesByCodeCompanyGroupBy(codeCompany string) ([]*models.Contract, bool) {
+func FindActivesByCodeCompanyGroupBy(codeCompany string) ([]*models.Contract, []*models.Contract, bool) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	condition := bson.M{"codeCompany": codeCompany, "state": "Vigente"}
-	var contracts []*models.Contract
+	condition := bson.M{"codeCompany": codeCompany, "state": "Vigente", "clientSupplier": "Cliente"}
+	var contractsC []*models.Contract
 
-	cursor, err := db.ContractCollection.Find(ctx, condition, options.Find().SetSort(bson.M{"clientProviderName": 1}).SetProjection(bson.M{"clientProviderName": 1, "codeCategoryInitial": 1}))
+	condition2 := bson.M{"codeCompany": codeCompany, "state": "Vigente", "clientSupplier": "Proveedor"}
+	var contractsP []*models.Contract
 
-	if err != nil {
-		return contracts, false
+	cursor, err := db.ContractCollection.Find(ctx, condition, options.Find().SetSort(bson.M{"clientProviderName": 1}).SetProjection(bson.M{"clientProviderName": 1, "codeCategoryInitial": 1, "clientSupplier": 1}))
+	cursor2, err2 := db.ContractCollection.Find(ctx, condition2, options.Find().SetSort(bson.M{"clientProviderName": 1}).SetProjection(bson.M{"clientProviderName": 1, "codeCategoryInitial": 1, "clientSupplier": 1}))
+
+	if err != nil || err2 != nil {
+		return contractsC, contractsP, false
 	}
 	err = cursor.Err()
-	if err != nil {
-		return contracts, false
+	err2 = cursor2.Err()
+	if err != nil || err2 != nil {
+		return contractsC, contractsP, false
 	}
 
 	defer cursor.Close(context.Background())
@@ -150,12 +155,23 @@ func FindActivesByCodeCompanyGroupBy(codeCompany string) ([]*models.Contract, bo
 		var contract models.Contract
 		err := cursor.Decode(&contract)
 		if err != nil {
-			return contracts, false
+			return contractsC, contractsP, false
 		}
 		//contract.ClientProviderName, _ = clientproviderservice.FindNameByCustID(contract.CodeReeup)
-		contracts = append(contracts, &contract)
+		contractsC = append(contractsC, &contract)
 	}
-	return contracts, true
+	defer cursor2.Close(context.Background())
+	for cursor2.Next(context.Background()) {
+		var contract2 models.Contract
+		err := cursor2.Decode(&contract2)
+		if err != nil {
+			return contractsC, contractsP, false
+		}
+		//contract.ClientProviderName, _ = clientproviderservice.FindNameByCustID(contract.CodeReeup)
+		contractsP = append(contractsP, &contract2)
+	}
+
+	return contractsC, contractsP, true
 }
 
 //------------ Range od Dates
