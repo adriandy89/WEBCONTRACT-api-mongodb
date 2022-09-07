@@ -9,9 +9,9 @@
     "icon": "information",
     "children": [
       {
-        "text": "Estadísticas Entidad",
+        "text": "Contratos Clasificados",
         "icon": "list",
-        "routerLink": "/dashboard/reports"
+        "routerLink": "/dashboard/reports/details"
       },
       {
         "text": "Resumen Entidades",
@@ -22,6 +22,11 @@
         "text": "Resumen General",
         "icon": "list",
         "routerLink": "/dashboard/reports-tree"
+      },
+      {
+        "text": "Resumen Revisión",
+        "icon": "list",
+        "routerLink": "/dashboard/reports"
       }
     ]
   },
@@ -43,11 +48,6 @@
         "text": "Listar Todos",
         "icon": "list",
         "routerLink": "/dashboard/contracts"
-      },
-      {
-        "text": "Contratos Clasificados",
-        "icon": "list",
-        "routerLink": "/dashboard/reports/details"
       },
       {
         "text": "Alertas",
