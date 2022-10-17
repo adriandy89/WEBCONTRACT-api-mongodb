@@ -24,7 +24,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userLogged, exist := authservice.Login(user.Username, user.Password)
+	userLogged, typeClient, exist := authservice.Login(user.Username, user.Password)
 	if !exist {
 		errorservice.ErrorMessage(w, "Credenciales Invalidas ó Inactivo!", 403)
 		return
@@ -35,7 +35,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	jwtKey, err := generarJwt(userLogged)
 	if err != nil {
-		errorservice.ErrorMessage(w, "Error en la generaciond de token de autenticación", 500)
+		errorservice.ErrorMessage(w, "Error en la generacion de token de autenticación", 500)
 		return
 	}
 
@@ -45,6 +45,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Token:       jwtKey,
 		User:        userLogged,
 		CompanyName: companyName,
+		Type:        typeClient,
 	}
 
 	w.Header().Set("content-type", "application/json")

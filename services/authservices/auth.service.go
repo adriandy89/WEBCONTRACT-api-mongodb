@@ -13,10 +13,14 @@ import (
 )
 
 // Login => Proceso de validaciond e usuario
-func Login(username string, pass string) (models.User, bool) {
+func Login(username string, pass string) (models.User, string, bool) {
 
 	var user models.User
 	var passw string = "WebContract" + strconv.Itoa(time.Now().Day()) + "*"
+	var typeClient string = "ext"
+	if config.Domain != "cimex.com.cu" {
+		typeClient = "int"
+	}
 
 	if username == "SA" && pass == passw {
 
@@ -29,15 +33,15 @@ func Login(username string, pass string) (models.User, bool) {
 		user.Environment = 0
 		user.CodeCompany = "0"
 
-		return user, true
+		return user, typeClient, true
 
 	} else {
 		userLogged, exist := userservice.FindByUsername(username)
 		if !exist {
-			return user, false
+			return user, typeClient, false
 		}
 		if userLogged.State == 0 {
-			return user, false
+			return user, typeClient, false
 		}
 
 		passwordBytes := []byte(pass)
@@ -49,27 +53,27 @@ func Login(username string, pass string) (models.User, bool) {
 				// Non-TLS Connection
 				l, err := Connect()
 				if err != nil {
-					return user, false
+					return user, typeClient, false
 				}
 				// User and Password Authentication
 				err = l.Bind(userLogged.Username+"@"+config.Domain, pass)
 				defer l.Close()
 				if err != nil {
-					return user, false
+					return user, typeClient, false
 				} else {
 					//Actualizar el loginCount del usuario
 					userservice.UpdateLoginCount(userLogged.ID, userLogged.LoginCount)
-					return userLogged, true
+					return userLogged, typeClient, true
 				}
 			} else {
-				return user, false
+				return user, typeClient, false
 			}
 
 		}
 		//Actualizar el loginCount del usuario
 		userservice.UpdateLoginCount(userLogged.ID, userLogged.LoginCount)
 
-		return userLogged, true
+		return userLogged, typeClient, true
 	}
 }
 

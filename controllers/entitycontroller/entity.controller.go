@@ -21,10 +21,10 @@ func GetAllEntities(w http.ResponseWriter, r *http.Request) {
 		errorservice.ErrorMessage(w, "Invalidos: "+err.Error(), 400)
 		return
 	}
-	if len(eList) <= 0 {
+	/* if len(eList) <= 0 {
 		errorservice.ErrorMessage(w, "No hay datos", 400)
 		return
-	}
+	} */
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(eList)

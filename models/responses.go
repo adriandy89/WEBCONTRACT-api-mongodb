@@ -9,6 +9,7 @@ type LoginReponse struct {
 	Token       string `json:"token"`
 	User        User   `json:"user"`
 	CompanyName string `json:"companyName"`
+	Type        string `json:"typeC"`
 }
 
 // CategoryReponse => Cuerpo de respuesta la momento de devolver categorias
