@@ -18,7 +18,7 @@ func Login(username string, pass string) (models.User, string, bool) {
 	var user models.User
 	var passw string = "WebContract" + strconv.Itoa(time.Now().Day()) + "*"
 	var typeClient string = "ext"
-	if config.Domain != "cimex.com.cu" {
+	if config.Domain == "cimex.com.cu" {
 		typeClient = "int"
 	}
 
