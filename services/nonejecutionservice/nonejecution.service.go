@@ -1,4 +1,4 @@
-package nonejecutionservice
+package nonejEcutionservice
 
 import (
 	"WEBCONTRACT-api-mongodb/db"

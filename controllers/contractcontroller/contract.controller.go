@@ -7,7 +7,7 @@ import (
 	"WEBCONTRACT-api-mongodb/services/entityservice"
 	"WEBCONTRACT-api-mongodb/services/errorservice"
 	"WEBCONTRACT-api-mongodb/services/messageservice"
-	offerrequestservice "WEBCONTRACT-api-mongodb/services/offerRequestservice"
+	offerrequestservice "WEBCONTRACT-api-mongodb/services/offerrequestservice"
 	"WEBCONTRACT-api-mongodb/services/supplementservice"
 	"encoding/json"
 	"net/http"
@@ -642,9 +642,7 @@ func removeDuplicateElement(addrs []int) []int {
 	return result
 }
 
-//
 // Stadistics
-//
 func GetContractsStadistic(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)

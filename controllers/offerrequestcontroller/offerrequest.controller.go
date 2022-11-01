@@ -4,7 +4,7 @@ import (
 	"WEBCONTRACT-api-mongodb/models"
 	"WEBCONTRACT-api-mongodb/services/errorservice"
 	"WEBCONTRACT-api-mongodb/services/messageservice"
-	offerrequestservice "WEBCONTRACT-api-mongodb/services/offerRequestservice"
+	offerrequestservice "WEBCONTRACT-api-mongodb/services/offerrequestservice"
 	"encoding/json"
 	"net/http"
 	"strconv"
